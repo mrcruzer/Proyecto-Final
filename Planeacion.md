@@ -106,22 +106,22 @@ Con esta información podemos decir que se tienen bastantes elementos para anali
         <br>
 
 * Análisis de sentimientos. Correlación entre los tipos de comentarios con las calificaciones de los locales.
-    * Clasificar, a partir del tono emocional de las palabras de las reseñas, los comentarios como positivos, negativos o neutrales.
+    * Identificar las palabras o frases más comunes utilizadas en las reseñas positivas y negativas, y analizar su impacto en la percepción general del negocio o servicio (correlación con la calificación).
         * Preprocesamiento de datos para eliminar ruido, caracteres extraños palabras irrelevantes y errores ortográficos.
-        * Clasificar las reseñas como positivas, negativas o neutrales comparándolas con el puntaje otorgado.
-        * Identificar los temas más relevantes, p.ej. calidad de servicio, comida, ubicación, etc...
-        * Visualizar los resultados, a partir de gráficas o mapas.
-    * (Escribir segundo objetivo)
-        * (Escribir tareas de segundo objetivo)
+        * Identificar las palabras más utilizadas para cada una de las calificaciones.
+        * A partir de las palabras identificar los temas más relevantes, p.ej. calidad de servicio, comida, ubicación, entre otros que se mencionen más en las distintas calificaciones.
+    * Elaborar un reporte con las áreas de oportunidad que la gente considera más relevantes para el sector restaurantero en general.
+        * Visualizar los resultados, a partir de gráficas o mapas, que muestren los temas más recurrentes cuando las califiaciones son buenas así como cuando las calificaciones son malas.
 
     <br>
 
-* Análisis de correlación entre atributos y puntaje.
-    * Identificar relación entre los atributos del local y los puntajes.
-        * Visualizar esta relación por medio de un dashboard u otro medio de visualización
+* (Linea de investigación 2)
+    * Identificar los atributos que mayor impacto tienen en la calificación del usuario.
+        * Armar tabla con los atributos como campos, las valoraciones (1 a 5) como registros y cantidad de veces que aparecen como los valores.
+        * Armar distintas métricas que nos indiquen porcentualmente cuanto aparecen los atributos en base a cada puntuación.
 
-    * (Segundo objetivo)
-        * (Tareas)
+    * Elaborar un reporte de recomendación sobre las características más elogiadas de los restaurantes contra las negativas que tiene el grupo restaurantero.
+        * Visualizar mediante streamlit y/o PowerBI los resultados obtenidos.
 <br>
 
 *  Sistema de recomendación al cliente basado en experiencias previas.
@@ -136,6 +136,5 @@ Con esta información podemos decir que se tienen bastantes elementos para anali
     * Elaborar una aplicación (deploy) que permita al usuario ingresar su id y le sugiera algún restaurante a partir de lo que calificó. Complementar con buscador que informe los restaurants mejor puntuados al buscar un tipo de restaurant.
         * Diseñar la aplicación.
         * Cargar el modelo en la aplicación.
-        * Crear modelo que identifique el texto ingresado para recomendar.
-        * Crear buscador.
+        * Crear programa que identifique el texto ingresado para recomendar.
         * Hacer pruebas.
