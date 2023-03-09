@@ -90,45 +90,38 @@ Con esta información podemos decir que se tienen bastantes elementos para anali
     * Obtener los datasets a trabajar:
         * Crear bases de datos.
         * Extraer data estática y cargarla en la base de datos.
-        * Encontrar fuentes complementarias.
-        * Automatizar la extracción de datos.
-    * Limpiar los datasets:
+        * Mediante webscrapping completar datos faltantes necesarios del dataset.
+    * Limpiar y transformar los datasets:
         * Eliminar columnas repetidas.
         * Eliminar filas repetidas.
+        * Eliminar registros que no se vayan a utilizar (negocios o reviews que no sean de/a restaurants)
+        * Normalizar los campos a utilizar
+        * Cruzar los dataset de negocios de Google y yelp y juntarlos en una sola tabla (si hay coincidencia normalizar)
+        * En caso de ser posible (por la reducción de la información) juntar todas las reviews en una sola tabla.
+        * Crear tabla con información relevante de los usuarios (id, estado y condado)
         * Tratar valores nulos.
         * Tratar outliers.
         * Noramlizar valores.
-        * Automatizar transformación de valores.
         
         <br>
 
 * Análisis de sentimientos. Correlación entre los tipos de comentarios con las calificaciones de los locales.
     * Clasificar, a partir del tono emocional de las palabras de las reseñas, los comentarios como positivos, negativos o neutrales.
-        * Preprocesamiento de datos para eliminar ruido, palabras irrelevantes y errores ortográficos.
-        * Clasificar las reseñas como positivas, negativas o neutrales.
+        * Preprocesamiento de datos para eliminar ruido, caracteres extraños palabras irrelevantes y errores ortográficos.
+        * Clasificar las reseñas como positivas, negativas o neutrales comparándolas con el puntaje otorgado.
         * Identificar los temas más relevantes, p.ej. calidad de servicio, comida, ubicación, etc...
-        * Analizar tendencias, a partir de opiniones y sentimientos de los usuarios a lo largo del tiempo.
         * Visualizar los resultados, a partir de gráficas o mapas.
-    * Elaborar un reporte de recomendación sobre las características más elogiadas de los restaurantes contra las negativas que tiene el grupo restaurantero.
-        * Diseñar el tablero
-        * Describir el contexto.
-        * Presentar gráficas.
-        * Diseñar indicadores.
-        * Redactar informe.
+    * (Escribir segundo objetivo)
+        * (Escribir tareas de segundo objetivo)
 
     <br>
 
-* Expansión en el mercado. La viabilidad de poner más restaurantes en otras zonas.
-    * Valorar la viabilidad de construir más restaurantes.
-        * Identificar las zonas con mayor potencial para la apertura de restaurantes en función de las recomendaciones.
-        * Analizar las tendencias (hacer uso del análisis de sentimientos).
-        * Identificar factores críticos para la apertura, como ubicación, tipo de comida, precio, servicios, entre otros.
-        * Evaluar posibles riesgos y desafíos asociados a la apertura de nuevos restaurantes.
+* Análisis de correlación entre atributos y puntaje.
+    * Identificar relación entre los atributos del local y los puntajes.
+        * Visualizar esta relación por medio de un dashboard u otro medio de visualización
 
-    * Elaborar una propuesta de características y sugerencias sobre los elementos que deben tener los nuevos locales con base en los comentarios y reseñas.
-        * Diseño del informe.
-        * Elaboración de indicadores.
-        * Redacción de resultados.
+    * (Segundo objetivo)
+        * (Tareas)
 <br>
 
 *  Sistema de recomendación al cliente basado en experiencias previas.
@@ -136,11 +129,13 @@ Con esta información podemos decir que se tienen bastantes elementos para anali
         * EDA
         * Optimización de parámetros.
         * Probar algoritmos - cross validation.
-        * Intancias modelo elegido.
+        * Intanciar modelo elegido.
         * Entrenar modelo.
         * Testear modelo.
         * Evaluar métricas.
-    * Elaborar una aplicación(deploy) que permita al usuario ingresar su id y le sugiera algún restaurante a partir de lo que comió, calificó o visitó.
+    * Elaborar una aplicación (deploy) que permita al usuario ingresar su id y le sugiera algún restaurante a partir de lo que calificó. Complementar con buscador que informe los restaurants mejor puntuados al buscar un tipo de restaurant.
         * Diseñar la aplicación.
         * Cargar el modelo en la aplicación.
+        * Crear modelo que identifique el texto ingresado para recomendar.
+        * Crear buscador.
         * Hacer pruebas.
