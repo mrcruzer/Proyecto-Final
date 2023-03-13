@@ -115,7 +115,7 @@ Con esta información podemos decir que se tienen bastantes elementos para anali
 
     <br>
 
-* (Linea de investigación 2)
+* Analisis de atributos. Correlación entre atributos y puntuaciones.
     * Identificar los atributos que mayor impacto tienen en la calificación del usuario.
         * Armar tabla con los atributos como campos, las valoraciones (1 a 5) como registros y cantidad de veces que aparecen como los valores.
         * Armar distintas métricas que nos indiquen porcentualmente cuanto aparecen los atributos en base a cada puntuación.
@@ -125,7 +125,7 @@ Con esta información podemos decir que se tienen bastantes elementos para anali
 <br>
 
 *  Sistema de recomendación al cliente basado en experiencias previas.
-    * Diseñar un modelo de machine learning que se ajuste a las preferencias a partir del ID del usuario.
+    * Diseñar un modelo de aprendizaje supervisado que se ajuste a las preferencias a partir del ID del usuario.
         * EDA
         * Optimización de parámetros.
         * Probar algoritmos - cross validation.
