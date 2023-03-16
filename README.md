@@ -20,3 +20,6 @@ El contenido va a ser listado en el orden dicatado por las consignas del proyect
 
 * **negocios_yelp.ipynb:** Notebook cuyo objettivo es filtrar de la tabla de negocios y de reviews de yelp solo las que conciernen a los restaurants.
 
+* **ETL_google_restaurant.ipynb:** Notebook que describe el proceso de extracción (desde el primer filtro), transformación y carga (exportación para cargar de manera estática a la base de datos) del dataset que contiene la informacidn de los restaurantes que ofrece Google.
+
+* **ETL_yelp_restaurant.ipynb:** Notebook que describe el proceso de extracción (desde el primer filtro), transformación y carga (exportación para cargar de manera estática a la base de datos) del dataset que contiene la informacidn de los restaurantes que ofrece Yelp.
