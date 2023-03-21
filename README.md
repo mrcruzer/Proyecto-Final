@@ -25,3 +25,7 @@ El contenido va a ser listado en el orden dicatado por las consignas del proyect
 * **transformaciones_yelp.ipynb:** Notebook cuyo objetivo es realizar las transformaciones necesarias tanto del dataset de negocios como de reseñas de yelp.
 
 * **Diccionario de Datos.pdf:** Documento con la infromación del tipo de datos que contiene cada archivo con el que se va a trabajar.
+
+* **Cruce_google_yelp:** Notebook con las transformaciones necesarias luego de cruzar los datasets de google y yelp. Se unen ambos datasets.
+
+* **Transformaciones.py:** Transformaciones realizadas en los 4 notebooks de transformaciones (negocios_google, reviews_google, transformaciones_yelp y Cruce_google_yelp) en script de python para poder automatizar el proceso.
