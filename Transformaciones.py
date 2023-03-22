@@ -183,7 +183,7 @@ restaurants_google = restaurants_google_con_reviews.reset_index(drop=True)
 reviews_google = estados_df[estados_df['Id_Restaurant'].isin(restaurants_google['Id_Restaurant'].values)]
 reviews_google.reset_index(inplace=True,drop=True)
 
-
+# ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #Arrancamos con la transformación del dataset de yelp
 #Importamos listado de negocios de yelp
