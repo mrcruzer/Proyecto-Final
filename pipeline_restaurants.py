@@ -4,6 +4,7 @@ import pandas as pd
 import pyodbc
 import json 
 import re
+#import pickle5 as pickle
 
 conn = pyodbc.connect(driver='ODBC Driver 18 for SQL Server;',
                       host='34.170.174.91;',
@@ -32,8 +33,15 @@ def get_data():
         dataframe = pd.DataFrame(df)
         google_metadata = dataframe.where(pd.notnull(dataframe), None)
         transform_data_google(google_metadata)
-        #google_metadata.info()
-        #return google_metadata
+        
+    elif(opcion == 2):
+        df = pd.read_pickle("./Data/business.pkl")
+        dataframe = pd.DataFrame(df)
+        business_yelp = dataframe.where(pd.notnull(dataframe), None)
+        transform_data_yelp(business_yelp)
+
+    elif(opcion == 3):
+      print("hola")
 
 
 def transform_data_google(google_metadata):
@@ -165,7 +173,45 @@ def transform_data_google(google_metadata):
     restaurants_google.drop_duplicates(subset=['Nombre','Cod_postal'],inplace=True)
     restaurants_google.reset_index(inplace=True,drop=True)
 
+
+
+    #restaurants_google.info()
+
+    return restaurants_google
     
+
+def transform_data_yelp(business_yelp):
+    #Arrancamos con la transformación del dataset de yelp
+
+    business_yelp_filt = business_yelp.iloc[:,:14]                  #Descartamos segundo set de columnas
+
+    #Tomamos solo los que tengan restaurant bajo category. Dropeamos primero entonces las categories nulas
+    business_yelp_filt.dropna(subset='categories',inplace=True)
+
+    #Filtramos unicamente los restaurants
+    restaurants_yelp = business_yelp_filt[business_yelp_filt['categories'].str.contains('estaura')]
+
+    #Reseteamos el índice y descartamos los valores duplicados de business_id
+    restaurants_yelp.drop_duplicates(subset='business_id',inplace=True)
+    restaurants_yelp.reset_index(inplace=True,drop=True)
+
+    #Descartamos columnas que no vayamos a utilizar, renombramos y reordenamos
+    restaurants_yelp.drop(columns=['address','stars','review_count','is_open','hours'],inplace=True)
+    restaurants_yelp.rename(columns={'business_id':'Id_Restaurant','name':'Nombre','city':'Ciudad','state':'Estado','postal_code':'Cod_postal',
+                                 'latitude':'Latitud','longitude':'Longitud','attributes':'Atributos','categories':'Tipo'},inplace=True)
+    restaurants_yelp = restaurants_yelp[['Id_Restaurant', 'Nombre', 'Ciudad', 'Estado', 'Cod_postal', 'Latitud',
+                                    'Longitud','Tipo','Atributos']]
+    
+    restaurants_yelp.info()
+
+def transform_google_yelp(restaurantes_google):
+
+    #datos_google = transform_data_google()
+    print(restaurantes_google)
+    dataframe = pd.DataFrame(restaurantes_google)
+    locando = dataframe.where(pd.notnull(dataframe), None)
+    locando.info()
+
 #@task 
 def load_data(datos3):
     
@@ -178,6 +224,8 @@ def load_data(datos3):
     
 def main():
     principal = get_data()
+    restaurantes_google = transform_data_google()
+    transform_google_yelp(restaurantes_google) 
     #transform_data(principal) 
     #load_data(principal)
     
