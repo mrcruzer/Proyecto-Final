@@ -29,22 +29,27 @@ def get_data():
     opcion = int(input("Ingrese la opcion deseada para reprocesar: 1: Google, 2: Yelp, 3: Ingresar las dos opciones: "))
 
     if(opcion == 1):
-        df = pd.read_json("./Data/restaurant-google.json", lines=True)
-        dataframe = pd.DataFrame(df)
-        google_metadata = dataframe.where(pd.notnull(dataframe), None)
-        transform_data_google(google_metadata)
+        data_google()
         
     elif(opcion == 2):
-        df = pd.read_pickle("./Data/business.pkl")
-        dataframe = pd.DataFrame(df)
-        business_yelp = dataframe.where(pd.notnull(dataframe), None)
-        transform_data_yelp(business_yelp)
+        get_data_yelp()
 
     elif(opcion == 3):
       print("hola")
 
 
-def transform_data_google(google_metadata):
+def get_data_yelp():
+    df = pd.read_pickle("./Data/restaurant-yelp.pkl")
+    dataframe = pd.DataFrame(df)
+    business_yelp = dataframe.where(pd.notnull(dataframe), None)
+    transform_data_yelp(business_yelp)
+
+
+def data_google():
+    df = pd.read_json("./Data/restaurant-google.json", lines=True)
+    dataframe = pd.DataFrame(df)
+    google_metadata = dataframe.where(pd.notnull(dataframe), None)
+    
     print("Haciendo transformaciones al datasets")
     google_metadata.drop_duplicates(subset='gmap_id',inplace=True) #Descartamos los duplicados de gmap_id que es el identificador de lugar
 
@@ -140,10 +145,10 @@ def transform_data_google(google_metadata):
     restaurants_google.drop(columns=['description','avg_rating','num_of_reviews','price',                   #Descartamos columnas
                                  'hours','state','relative_results','url','address'], inplace=True)
 
-    restaurants_google.rename(columns={'name':'Nombre','gmap_id':'Id_Restaurant','latitude':'Latitud','longitude':'Longitud',
+    restaurants_google.rename(columns={'name':'Nombre','gmap_id':'Id_Restaurante','latitude':'Latitud','longitude':'Longitud',
                                    'category':'Tipo','MISC':'Atributos'},inplace=True)              #Cambiamos nombre
 
-    restaurants_google = restaurants_google[['Id_Restaurant','Nombre','Ciudad','Estado','Cod_postal',       #Reordenamos
+    restaurants_google = restaurants_google[['Id_Restaurante','Nombre','Ciudad','Estado','Cod_postal',       #Reordenamos
                                          'Latitud', 'Longitud', 'Tipo', 'Atributos']]
 
     restaurants_google.dropna(subset=['Cod_postal'],inplace=True)                     #Descartamos valores nulos de cod postal (y por lo tanto de estado y ciudad)
@@ -158,26 +163,40 @@ def transform_data_google(google_metadata):
 
     #Tomamos los ids a conservar y los que se van a cambiar
     lista_duplicados = []
-    for n in negocios_duplicados_google['Id_Restaurant'].values:
+    for n in negocios_duplicados_google['Id_Restaurante'].values:
         aux = []
-        nombre = negocios_duplicados_google[negocios_duplicados_google['Id_Restaurant']==n]['Nombre'].values[0]
-        cod_postal = negocios_duplicados_google[negocios_duplicados_google['Id_Restaurant']==n]['Cod_postal'].values[0]
+        nombre = negocios_duplicados_google[negocios_duplicados_google['Id_Restaurante']==n]['Nombre'].values[0]
+        cod_postal = negocios_duplicados_google[negocios_duplicados_google['Id_Restaurante']==n]['Cod_postal'].values[0]
     for d in range(duplicados_google.shape[0]):
-        if (duplicados_google['Nombre'][d] == nombre) and (duplicados_google['Cod_postal'][d] == cod_postal) and (duplicados_google['Id_Restaurant'][d] != n):
-            aux.append(duplicados_google['Id_Restaurant'][d])
+        if (duplicados_google['Nombre'][d] == nombre) and (duplicados_google['Cod_postal'][d] == cod_postal) and (duplicados_google['Id_Restaurante'][d] != n):
+            aux.append(duplicados_google['Id_Restaurante'][d])
             lista_duplicados.append([n,aux])
 
-    duplicados_google_df = pd.DataFrame(data=lista_duplicados,columns=['Conservar','Cambiar'])  #Armammos dataframe
+        duplicados_google_df = pd.DataFrame(data=lista_duplicados,columns=['Conservar','Cambiar'])  #Armammos dataframe
 
-#Descartamos los duplicados
+    #Descartamos los duplicados
     restaurants_google.drop_duplicates(subset=['Nombre','Cod_postal'],inplace=True)
     restaurants_google.reset_index(inplace=True,drop=True)
 
+    # el campo Tipo y Atributos lo cambio a String
+    restaurants_google['Tipo'] = restaurants_google['Tipo'].astype(str) 
+    restaurants_google['Atributos'] = restaurants_google['Atributos'].astype(str) 
+
+    restaurants_google
+    #nuevo = restaurants_google.tail(10)
+    print(restaurants_google.head(10))
+
+    print("Insertando datos a la DB")
 
 
-    #restaurants_google.info()
+    for index, row in restaurants_google.iterrows():
+        cursor.execute("INSERT INTO dbo.Restaurantes (Id_Restaurante, Nombre, Ciudad, Estado, Cod_postal, Latitud, Longitud, Tipo, Atributos) values(?, ?, ?, ?, ?, ?, ?, ?, ?)", 
+                    row.Id_Restaurante, row.Nombre, row.Ciudad, row.Estado, row.Cod_postal, row.Latitud, row.Longitud, row.Tipo, row.Atributos
+                   )
+    cursor.commit()
 
-    return restaurants_google
+    print("Termine de ingresar datos")   
+
     
 
 def transform_data_yelp(business_yelp):
@@ -204,30 +223,25 @@ def transform_data_yelp(business_yelp):
     
     restaurants_yelp.info()
 
-def transform_google_yelp(restaurantes_google):
+    return restaurants_yelp
 
-    #datos_google = transform_data_google()
-    print(restaurantes_google)
-    dataframe = pd.DataFrame(restaurantes_google)
-    locando = dataframe.where(pd.notnull(dataframe), None)
-    locando.info()
+#def transform_google_yelp(restaurantes_google):
 
 #@task 
-def load_data(datos3):
+def load_data_google(datos3):
     
     print("Insertando datos a la DB")
-    #cursor.executemany("INSERT INTO dbo.Arizona (Id_usuario, Id_Restaurant, Fecha, Rating, Resena) VALUES (?,?,?,?,?)", datos3.values.tolist())
-    #conn.commit()  
+    cursor.executemany("INSERT INTO dbo.probando (Id_Restaurant, Nombre, Ciudad, Estado, Cod_postal, Latitud, Longitud, Tipo, Atributos) VALUES (?,?,?,?,?,?,?,?,?)", datos3.values.tolist())
+    conn.commit()  
     print(datos3)
-    #print("Termine de ingresar datos")   
+    print("Termine de ingresar datos")   
     
     
 def main():
     principal = get_data()
-    restaurantes_google = transform_data_google()
-    transform_google_yelp(restaurantes_google) 
-    #transform_data(principal) 
-    #load_data(principal)
+    #datos_google = get_data_google()
+    #google = transform_data_google(datos_google) 
+    #load_data_google(google)
     
     
 main()
