@@ -26,7 +26,7 @@ cursor = conn.cursor()
 #@task()
 def get_data():
     
-    opcion = int(input("Ingrese la opcion deseada para reprocesar: 1: Google, 2: Yelp, 3: Google + Yelp: "))
+    opcion = int(input("Ingrese la opcion deseada para reprocesar Restaurantes: 1: Google, 2: Yelp, 3: Google + Yelp: "))
 
     if(opcion == 1):
         data_google()
