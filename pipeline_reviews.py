@@ -42,7 +42,7 @@ def load_data(datos):
     print("Insertando datos a la DB")
 
     for index, row in datos.iterrows():
-        cursor.execute("INSERT INTO dbo.probando2 (Id_Usuario, Id_Restaurante, Timestamp, Rating, Resena) values(?, ?, ?, ?, ?)", 
+        cursor.execute("INSERT INTO dbo.Resenas (Id_Usuario, Id_Restaurante, Timestamp, Rating, Resena) values(?, ?, ?, ?, ?)", 
                   row.Id_Usuario, row.Id_Restaurante, row.Timestamp, row.Rating, row.Resena
                    )
     cursor.commit()
@@ -52,45 +52,38 @@ def load_data(datos):
 
 
 def data_yelp():
-    df = pd.read_pickle("./Data/restaurant-yelp.pkl")
+    # Cargamos las review de google
+    df = pd.read_json("./Data/review-yelp.json", lines=True)
     dataframe = pd.DataFrame(df)
-    business_yelp = dataframe.where(pd.notnull(dataframe), None)
-    business_yelp_filt = business_yelp.iloc[:,:14]                  #Descartamos segundo set de columnas
+    yelp_review = dataframe.where(pd.notnull(dataframe), None)
 
-    #Tomamos solo los que tengan restaurant bajo category. Dropeamos primero entonces las categories nulas
-    business_yelp_filt.dropna(subset='categories',inplace=True)
+    # Llamamos los restaurantes de la DB
+    sql = "Select * From dbo.Restaurantes"
+    restaurants_yelp = pd.read_sql(sql,conn) 
 
-    #Filtramos unicamente los restaurants
-    restaurants_yelp = business_yelp_filt[business_yelp_filt['categories'].str.contains('estaura')]
+    #Probamos filtrar
+    yelp_review_filtro = yelp_review[yelp_review['business_id'].isin(restaurants_yelp['Id_Restaurante'].values)]
 
-    #Reseteamos el índice y descartamos los valores duplicados de business_id
-    restaurants_yelp.drop_duplicates(subset='business_id',inplace=True)
-    restaurants_yelp.reset_index(inplace=True,drop=True)
+    #Descartamos los campos que no se utilizan
+    yelp_review_filtro.drop(columns=['review_id','useful','funny','cool'],inplace=True)
 
-    #Descartamos columnas que no vayamos a utilizar, renombramos y reordenamos
-    restaurants_yelp.drop(columns=['address','stars','review_count','is_open','hours'],inplace=True)
-    restaurants_yelp.rename(columns={'business_id':'Id_Restaurante','name':'Nombre','city':'Ciudad','state':'Estado','postal_code':'Cod_postal',
-                                 'latitude':'Latitud','longitude':'Longitud','attributes':'Atributos','categories':'Tipo'},inplace=True)
-    restaurants_yelp = restaurants_yelp[['Id_Restaurante', 'Nombre', 'Ciudad', 'Estado', 'Cod_postal', 'Latitud',
-                                    'Longitud','Tipo','Atributos']]
-    
-    # el campo Tipo y Atributos lo cambio a String
-    restaurants_yelp['Tipo'] = restaurants_yelp['Tipo'].astype(str) 
-    restaurants_yelp['Atributos'] = restaurants_yelp['Atributos'].astype(str) 
-    
-    restaurants_yelp
-    print(restaurants_yelp.head())
+    #Cambiamos el nombre
+    yelp_review_filtro.rename(columns={'user_id':'Id_Usuario','business_id':'Id_Restaurante','stars':'Rating','text':'Resena', 'date':'Timestamp'}, inplace=True)
+    yelp_review_filtro.info()
 
-    #restaurants_yelp.to_pickle("./Data/restaurant_cruce_yelp.pkl")
+     #Reordenamos
+    yelp_review_filtro = yelp_review_filtro =[['Id_Usuario', 'Id_Restaurante', 'Timestamp', 'Rating', 'Resena']]
+    yelp_review_filtro.drop_duplicates(inplace=True)
 
     opcion = int(input("Si necesitas insertar la data a la DB, Escribeme 1: "))
 
     if(opcion == 1):
-        load_data(restaurants_yelp)
+        load_data(yelp_review_filtro)
     else:
         print("No ingresaste la Data a la DB")
 
-    return restaurants_yelp
+    return yelp_review_filtro
+
 
 
 
@@ -162,18 +155,16 @@ def data_google():
 
     print(reviews_google.head(10))
 
-    nuevo = reviews_google.tail(10)
-
    
 
     opcion = int(input("Si necesitas insertar la data a la DB, Escribeme 1: "))
 
     if(opcion == 1):
-        load_data(nuevo)
+        load_data(reviews_google)
     else:
         print("No ingresaste la Data a la DB")
 
-    return nuevo
+    return reviews_google
 
  
 
