@@ -4,7 +4,7 @@ import pandas as pd
 import pyodbc
 import json 
 import re
-#import pickle5 as pickle
+from time import sleep
 
 conn = pyodbc.connect(driver='ODBC Driver 18 for SQL Server;',
                       host='34.170.174.91;',
@@ -26,7 +26,7 @@ cursor = conn.cursor()
 #@task()
 def get_data():
     
-    opcion = int(input("Ingrese la opcion deseada para reprocesar: 1: Google, 2: Yelp, 3: Ingresar las dos opciones: "))
+    opcion = int(input("Ingrese la opcion deseada para reprocesar: 1: Google, 2: Yelp, 3: Google + Yelp: "))
 
     if(opcion == 1):
         data_google()
@@ -36,6 +36,9 @@ def get_data():
 
     elif(opcion == 3):
       data_google_yelp()
+
+    else: 
+        print("Ingresa la opcion deseada")
 
 
 def load_data(datos):
@@ -81,14 +84,12 @@ def data_yelp():
     restaurants_yelp
     print(restaurants_yelp.head())
 
-    #restaurants_yelp.to_pickle("./Data/restaurant_cruce_yelp.pkl")
+    print("Esperando para ingresar datos")
 
-    opcion = int(input("Si necesitas insertar la data a la DB, Escribeme 1: "))
+    sleep(5)
 
-    if(opcion == 1):
-        load_data(restaurants_yelp)
-    else:
-        print("No ingresaste la Data a la DB")
+    load_data(restaurants_yelp)
+
 
     return restaurants_yelp
 
@@ -236,14 +237,15 @@ def data_google():
     #nuevo = restaurants_google.tail(10)
     print(restaurants_google.head(10))
 
-    restaurants_google.to_json("./Data/restaurant_cruce_google.json")
+    #restaurants_google.to_json("./Data/restaurant_cruce_google.json")
 
-    opcion = int(input("Si necesitas insertar la data a la DB, Escribeme 1: "))
+    #nuevo = restaurants_google.tail(10)
 
-    if(opcion == 1):
-        load_data(restaurants_google)
-    else:
-        print("No ingresaste la Data a la DB")
+    print("Esperando para insertar")
+
+    sleep(5)
+
+    load_data(restaurants_google)
 
     return restaurants_google
  
@@ -442,12 +444,11 @@ def data_google_yelp():
 
     #nuevo = restaurants.tail(10)
 
-    opcion = int(input("Si necesitas insertar la data a la DB, Escribeme 1: "))
+    print("Estoy insertado la data")
 
-    if(opcion == 1):
-        load_data(restaurants)
-    else:
-        print("No ingresaste la Data a la DB")
+    sleep(5)
+
+    load_data(restaurants)
 
     return restaurants 
 
