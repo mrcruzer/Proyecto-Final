@@ -32,4 +32,6 @@ El contenido va a ser listado en el orden dicatado por las consignas del proyect
 
 * **Procesamiento_Reseñas.ipynb:** Notebook donde se muestra el procesamiento de los textos de los comentarios realizados en las reseñas.
 
+* **Analisis_exploratorio_de_datos.ipynb:** Notebook donde se muestra el análisis exploratorio para ingestar en el modelo de Machine Learning "buenos" datos.
+
 * **sistema_recomendacion.ipynb:** Notebook donde se muestra el desarrollo del sistema de recomendación (seleccion de data, optimización de hiperparámetros, etc.)
