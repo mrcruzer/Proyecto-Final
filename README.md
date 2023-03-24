@@ -30,6 +30,10 @@ El contenido va a ser listado en el orden dicatado por las consignas del proyect
 
 * **Transformaciones.py:** Transformaciones realizadas en los 4 notebooks de transformaciones (negocios_google, reviews_google, transformaciones_yelp y Cruce_google_yelp) en script de python para poder automatizar el proceso.
 
+* **pipeline_restaurants.py:** Script con el la automatización de carga de datos de restaurants desde el origen hacia nuestra base de datos.
+
+* **pipeline_reviews.py:** Script con el la automatización de carga de datos de reviews desde el origen hacia nuestra base de datos.
+
 * **Procesamiento_Reseñas.ipynb:** Notebook donde se muestra el procesamiento de los textos de los comentarios realizados en las reseñas.
 
 * **Analisis_exploratorio_de_datos.ipynb:** Notebook donde se muestra el análisis exploratorio para ingestar en el modelo de Machine Learning "buenos" datos.
