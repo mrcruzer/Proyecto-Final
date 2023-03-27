@@ -25,6 +25,8 @@ El contenido va a ser listado en el orden dicatado por las consignas del proyect
 
 * **pipelines_folder:** Carpeta donde se alojan los scripts con la automatización de carga de datos de Restaurants y Reviews desde el origen hacia nuestra base de datos. [Acceder aquí](https://github.com/marcoslarran/Proyecto-Final/tree/main/pipeline_folder)
 
+* **sistema_recomendación:** Carpeta donde se encuentran 2 archivo para el desarrollo del sistema de recomendación (seleccion de data, optimización de hiperparámetros, etc). [Acceder aquí](https://github.com/marcoslarran/Proyecto-Final/tree/main/sistema_recomendaci%C3%B3n)
+
 * **Procesamiento_Reseñas.ipynb:** Notebook donde se muestra el procesamiento de los textos de los comentarios realizados en las reseñas.
 
 * **Analisis_exploratorio_de_datos.ipynb:** Notebook donde se muestra el análisis exploratorio para ingestar en el modelo de Machine Learning "buenos" datos.
