@@ -59,4 +59,4 @@ El contenido del proyecto donde contiene links directos hacia.
    
 - **Streamlit:** Es un “framework” de Python que permite de manera sencilla desarrollar aplicaciones.  
    
-- **:**
+- **SQL Server:** Sistema de gestión de bases de datos relacional
