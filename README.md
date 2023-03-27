@@ -7,6 +7,13 @@ Somos G7 Consulting Services, consultora especializada en análisis de datos y m
 ## Contexto
 
 La industria restaurantera ha tenido un crecimiento interesante en los Estados Unidos, principalmente la que se refiere a la comida asiática, que ha tenido mayor popularidad debido al uso de especias y picantes, así como al creciente numero de inmigrantes y el espíritu aventurero del paladar norteamericano. En este sentido, fuimos contratados por el grupo restaurantero de comida, que desea un análisis detallado de la opinión de los usuarios, utilizando análisis de sentimientos, y sistemas de recomendación para el usuario basados en experiencias previas.
+   
+ ## Objetivos realizar
+ 
+ Sistemas de recomendación: Se realizará un sistema de recomendación de restaurantes en una amplia variedad de tipos de comida.
+ 
+ Datos adicionales cruzados: Se buscan cruzar datos de fuentes como la API de Yahoo Finance, y webscraping  
+   
 
 ## Contenido
 
