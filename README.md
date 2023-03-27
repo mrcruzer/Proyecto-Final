@@ -48,7 +48,7 @@ La industria restaurantera ha tenido un crecimiento interesante en los Estados U
 
 ## Contenido
 
-El contenido del proyecto donde contiene links directos hacia.
+El contenido del proyecto donde se encuentran las carpetas y/o archivos correspondientes.
 
 * **primera aproximacion.ipynb:** Notebook con el código realizado para el primer acercamiento a la data con el objetivo de explorar como venían los datos, en que formato, etc.
 
