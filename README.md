@@ -42,15 +42,7 @@ El contenido del proyecto donde contiene links directos hacia.
 
 * **primera aproximacion.ipynb:** Notebook con el código realizado para el primer acercamiento a la data con el objetivo de explorar como venían los datos, en que formato, etc.
 
-* **Planeacion:** Carpeta que contiene los siguientes archivos.
-
-    * **Planeacion.md:** Documento que enlista las lineas de investigación y los objetivos planteados, así como un primer boceto de las tareas a realizar. Un documento con mayor contexto y explicación puede encontrarse en el siguiente Gitbook: https://marcos-larran.gitbook.io/marcoslarran-proyecto-final/
-
-    * **Diagrama de Gantt.pdf:** Documento que enlista las tareas a realizar, el porcentaje realizado y establece las fechas previstas para las mismas. Editable.
-
-    * **Presentacion Restaurantes.pptx:** Material de soporte para realizar la reunión de finalización del Sprint 1.
-    
-    * **PPT Engineering:** Material de soporte para realizar la reunión del sprint de finalización del Sprint 2.
+* **Planeacion:** Carpeta que contiene los archivos de planeación del proyecto. [Acceder aquí](https://github.com/marcoslarran/Proyecto-Final/tree/main/Planeaci%C3%B3n))
 
 * **Diccionario de Datos.pdf:** Documento con la infromación del tipo de datos que contiene cada archivo con el que se va a trabajar.
 
