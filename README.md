@@ -80,3 +80,16 @@ El contenido del proyecto donde contiene links directos hacia.
 - **Streamlit:** Es un “framework” de Python que permite de manera sencilla desarrollar aplicaciones.  
    
 - **SQL Server:** Sistema de gestión de bases de datos relacional.
+   
+## Conclusiónes
+   
+Con estos elementos, la información nos ayudará a conocer:
+   
+* El sentimiento de los usuarios con respecto al servicio que se está prestando.
+   
+* Las características que se consideran ideales.
+   
+* Captar de información sobre las tendencias de las preferencias de los clientes (modelo de aprendizaje automatizado).<br>
+   
+Todo ello nos permitirá ser más competitivos, adaptarnos rápido a las tendencias y pensar en experiencias nuevas para el cliente basado en sus elecciones.
+
