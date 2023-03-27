@@ -19,17 +19,7 @@ El contenido va a ser listado en el orden dicatado por las consignas del proyect
     
     * **PPT Engineering:** Material de soporte para realizar la reunión del sprint de finalización del Sprint 2.
 
-* **reviews_google.ipynb:** Notebook cuyo objetivo principal es realizar las transformaciones necesarias en los dataset de reseñas de google.
-
-* **negocios_google.ipynb:** Notebook cuyo objetivo es realizar las transformaciones necesarias en los dataset de negocios de google.
-
-* **transformaciones_yelp.ipynb:** Notebook cuyo objetivo es realizar las transformaciones necesarias tanto del dataset de negocios como de reseñas de yelp.
-
 * **Diccionario de Datos.pdf:** Documento con la infromación del tipo de datos que contiene cada archivo con el que se va a trabajar.
-
-* **Cruce_google_yelp:** Notebook con las transformaciones necesarias luego de cruzar los datasets de google y yelp. Se unen ambos datasets.
-
-* **Transformaciones.py:** Transformaciones realizadas en los 4 notebooks de transformaciones (negocios_google, reviews_google, transformaciones_yelp y Cruce_google_yelp) en script de python para poder automatizar el proceso.
 
 * **transformaciones:** Carpeta donde se encuentran 5 archivos donde se realizan transformaciónes en los datasets con su respectivo README explicativo. [Acceder aquí](https://github.com/marcoslarran/Proyecto-Final/tree/main/transformaciones)
 
