@@ -38,7 +38,7 @@ El contenido va a ser listado en el orden dicatado por las consignas del proyect
 - **Google Cloud Platform(GCP):** Plataforma en la nube donde se utilizaron varios servicios.
    
 - **Python:** Se utilizó Python para realizar el proyecto en tareas como:<br>
-      ETL / EDA: Se utilizó Pandas.
+      ETL / EDA: Se utilizó Pandas.<br>
       Machine Learning: Se utilizó scikit-learn
    
 - **LucidChart:** Herramienta de diagramación basada en la web, que permite a los usuarios colaborar y trabajar juntos en tiempo real.
