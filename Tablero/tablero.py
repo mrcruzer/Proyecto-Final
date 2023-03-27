@@ -4,7 +4,7 @@ st.markdown("<h1 style='text-align: center; color: orange;'>CIENCIA DE DATOS PAR
 
 "*Por*"
 
-"Isaac Moreno"
+"Isaac Avelino"
 "Luciano González"
 "Marcos Larran"
 "Manuel Hernández"
