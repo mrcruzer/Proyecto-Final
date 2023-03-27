@@ -1,5 +1,5 @@
 <h1 align=center>
-   ![](https://github.com/marcoslarran/Proyecto-Final/blob/main/assets/g7-logo.png)
+   https://github.com/marcoslarran/Proyecto-Final/blob/main/assets/g7-logo.png
 
 El siguiente contenido es una guía para poder seguir el trabajo realizado por **Marcos Larran, Isaac Avelino, Luciano Gonzales y Manuel Hernandez** para el **Proyecto Final** de SoyHenry.
 
