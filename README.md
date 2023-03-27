@@ -1,5 +1,5 @@
 <h1 align=center>
-   <img src="ruta/a/tu/imagen.jpg" alt="Descripción de la imagen" width="400" height="300">
+   <img src="https://github.com/marcoslarran/Proyecto-Final/blob/main/assets/g7_logo.jpeg" alt="Descripción de la imagen" width="400" height="300">
 
 El siguiente contenido es una guía para poder seguir el trabajo realizado por **Marcos Larran, Isaac Avelino, Luciano Gonzales y Manuel Hernandez** para el **Proyecto Final** de SoyHenry.
 
