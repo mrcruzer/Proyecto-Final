@@ -31,7 +31,7 @@ El contenido va a ser listado en el orden dicatado por las consignas del proyect
 
 * **Transformaciones.py:** Transformaciones realizadas en los 4 notebooks de transformaciones (negocios_google, reviews_google, transformaciones_yelp y Cruce_google_yelp) en script de python para poder automatizar el proceso.
 
-* **[transformaciones:](https://github.com/marcoslarran/Proyecto-Final/tree/main/pipeline_folder)** Carpeta donde se encuentran 5 archivos donde se realizan transformaciónes en los datasets con su respectivo README explicativo. 
+* **[transformaciones:](https://github.com/marcoslarran/Proyecto-Final/tree/main/transformaciones)** Carpeta donde se encuentran 5 archivos donde se realizan transformaciónes en los datasets con su respectivo README explicativo. 
 
 * **pipelines_folder:** Carpeta donde se alojan los scripts con la automatización de carga de datos de Restaurants y Reviews desde el origen hacia nuestra base de datos. [Acceder aquí](https://github.com/marcoslarran/Proyecto-Final/tree/main/pipeline_folder)
 
