@@ -31,8 +31,6 @@ El contenido va a ser listado en el orden dicatado por las consignas del proyect
 
 * **Analisis_exploratorio_de_datos.ipynb:** Notebook donde se muestra el análisis exploratorio para ingestar en el modelo de Machine Learning "buenos" datos.
 
-* **sistema_recomendacion.ipynb:** Notebook donde se muestra el desarrollo del sistema de recomendación (seleccion de data, optimización de hiperparámetros, etc.)
-
    
 ## Stack Tecnológico
 - **Windows** Sistema operativo utilizado por todos los integrantes del proyecto.
