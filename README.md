@@ -1,11 +1,16 @@
 <h1 align=center>
    <img src="https://github.com/marcoslarran/Proyecto-Final/blob/main/assets/g7_logo.jpeg" alt="Descripción de la imagen" width="400" height="300">
 
-El siguiente contenido es una guía para poder seguir el trabajo realizado por **Marcos Larran, Isaac Avelino, Luciano Gonzales y Manuel Hernandez** para el **Proyecto Final** de SoyHenry.
+Somos G7 Consulting Services, consultora especializada en análisis de datos y modelos de aprendizaje automatizado. Dedicados a brindar un servicio constante de atención al cliente y garantía de satisfacción.
+
+
+## Contexto
+
+La industria restaurantera ha tenido un crecimiento interesante en los Estados Unidos, principalmente la que se refiere a la comida asiática, que ha tenido mayor popularidad debido al uso de especias y picantes, así como al creciente numero de inmigrantes y el espíritu aventurero del paladar norteamericano. En este sentido, fuimos contratados por el grupo restaurantero de comida, que desea un análisis detallado de la opinión de los usuarios, utilizando análisis de sentimientos, y sistemas de recomendación para el usuario basados en experiencias previas.
 
 ## Contenido
 
-El contenido va a ser listado en el orden dicatado por las consignas del proyecto.
+El contenido del proyecto donde contiene links directos hacia.
 
 * **primera aproximacion.ipynb:** Notebook con el código realizado para el primer acercamiento a la data con el objetivo de explorar como venían los datos, en que formato, etc.
 
