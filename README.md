@@ -30,3 +30,21 @@ El contenido va a ser listado en el orden dicatado por las consignas del proyect
 * **Analisis_exploratorio_de_datos.ipynb:** Notebook donde se muestra el análisis exploratorio para ingestar en el modelo de Machine Learning "buenos" datos.
 
 * **sistema_recomendacion.ipynb:** Notebook donde se muestra el desarrollo del sistema de recomendación (seleccion de data, optimización de hiperparámetros, etc.)
+
+   
+## Stack Tecnológico
+- **Windows** Sistema operativo utilizado por todos los integrantes del proyecto.
+   
+- **Google Cloud Platform(GCP):** Plataforma en la nube donde se utilizaron varios servicios.
+   
+- **Python:** Se utilizó Python para realizar el proyecto en tareas como:<br>
+      ETL / EDA: Se utilizó Pandas.
+      Machine Learning: Se utilizó scikit-learn
+   
+- **LucidChart:** Herramienta de diagramación basada en la web, que permite a los usuarios colaborar y trabajar juntos en tiempo real.
+   
+- **Google Drive:** Servicio de Google que permite almacenar archivos en la nube.
+   
+- **Streamlit:** Es un “framework” de Python que permite de manera sencilla desarrollar aplicaciones.  
+   
+- **:**
