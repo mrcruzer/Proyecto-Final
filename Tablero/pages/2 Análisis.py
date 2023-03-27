@@ -4,7 +4,7 @@ import pandas as pd
 import wbgapi as wb
 import yfinance as yf
 import numpy as np
-import folium
+# import folium
 from streamlit_folium import folium_static
 from datetime import datetime
 import re
@@ -190,7 +190,6 @@ if tot_res_pos == 0 and tot_res_neg ==0:
 elif tot_res_neg == 0:
     st.warning(f"El restaurante: '{slide_restaurant}'; en el Estado de {estado}, no cuenta con reseñas negativas. Todas son positivas ¡F e l i c i d a d e s!.")
 else: #Si hay datos, se procede a elaborar el gráfico para el indicador.
-    if 
     fig_kpi1 = go.Figure(go.Indicator(
         mode = "gauge+number+delta",
         value = tot_res_pos / tot_res_neg,
