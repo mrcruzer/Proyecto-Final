@@ -3,6 +3,16 @@
 
 Somos G7 Consulting Services, consultora especializada en análisis de datos y modelos de aprendizaje automatizado. Dedicados a brindar un servicio constante de atención al cliente y garantía de satisfacción.
 
+## Índices
+- [Contexto](#contexto)
+- [Objetivos](#objetivos)
+- [Problemáticas](#problemáticas)
+- [Flujo de trabajo](#flujo-de-trabajo)
+- [Contenido](#contenido)
+- [KPI's](#kpis)
+- [Stack Tecnológico](#stack-tecnológico)
+- [Conclusiónes](#conclusiónes)
+
 
 ## Contexto
 
@@ -18,7 +28,7 @@ La industria restaurantera ha tenido un crecimiento interesante en los Estados U
    
 * Experiencias satisfactorias.
    
-## Problematicas
+## Problemáticas
 
 * Identificar y analizar las reseñas positivas, negativas y neutrales.
    
