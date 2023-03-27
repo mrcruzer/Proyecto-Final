@@ -32,6 +32,9 @@ La industria restaurantera ha tenido un crecimiento interesante en los Estados U
    
 * Elaborar una aplicación (deploy) para uso del cliente.
    
+  
+## Flujo de trabajo
+...
 
 ## Contenido
 
@@ -60,6 +63,10 @@ El contenido del proyecto donde contiene links directos hacia.
 * **Procesamiento_Reseñas.ipynb:** Notebook donde se muestra el procesamiento de los textos de los comentarios realizados en las reseñas.
 
 * **Analisis_exploratorio_de_datos.ipynb:** Notebook donde se muestra el análisis exploratorio para ingestar en el modelo de Machine Learning "buenos" datos.
+
+
+## KPI's
+...
 
    
 ## Stack Tecnológico
