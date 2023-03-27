@@ -1,4 +1,4 @@
-<h1 align=center>
+<h2 align=center>
    <img src="https://github.com/marcoslarran/Proyecto-Final/blob/main/assets/g7_logo.jpeg" alt="Descripción de la imagen">
 
 El siguiente contenido es una guía para poder seguir el trabajo realizado por **Marcos Larran, Isaac Avelino, Luciano Gonzales y Manuel Hernandez** para el **Proyecto Final** de SoyHenry.
