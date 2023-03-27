@@ -45,13 +45,15 @@ El contenido del proyecto donde contiene links directos hacia.
 
    
 ## Stack Tecnológico
-- **Windows** Sistema operativo utilizado por todos los integrantes del proyecto.
+- **Windows:** Sistema operativo utilizado por todos los integrantes del proyecto.
+   
+- **Linux:** Sistema operativo utilizado por VM Engine en GCP
    
 - **Google Cloud Platform(GCP):** Plataforma en la nube donde se utilizaron varios servicios.
    
 - **Python:** Se utilizó Python para realizar el proyecto en tareas como:<br>
       ETL / EDA: Se utilizó Pandas.<br>
-      Machine Learning: Se utilizó scikit-learn
+      Machine Learning: Se utilizó scikit-learn.
    
 - **LucidChart:** Herramienta de diagramación basada en la web, que permite a los usuarios colaborar y trabajar juntos en tiempo real.
    
@@ -59,4 +61,4 @@ El contenido del proyecto donde contiene links directos hacia.
    
 - **Streamlit:** Es un “framework” de Python que permite de manera sencilla desarrollar aplicaciones.  
    
-- **SQL Server:** Sistema de gestión de bases de datos relacional
+- **SQL Server:** Sistema de gestión de bases de datos relacional.
