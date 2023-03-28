@@ -10,7 +10,7 @@ import pyodbc
 st.title('Sistema de recomendación de restaurants')
 
 #Realizamos la conexión a la base de datos
-conn = pyodbc.connect(driver='SQL Server;',
+conn = pyodbc.connect(driver='ODBC Driver 18 for SQL Server;',
                       host='34.170.174.91;',
                       database='grupo7;',
                       uid='henry;',
