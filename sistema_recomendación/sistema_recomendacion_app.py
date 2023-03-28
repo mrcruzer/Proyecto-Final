@@ -5,19 +5,19 @@ from surprise.model_selection import train_test_split
 from surprise.prediction_algorithms.matrix_factorization import SVD
 from surprise import accuracy
 import datetime
-#import pyodbc
+import pyodbc
 
 st.title('Sistema de recomendación de restaurants')
 
 #Realizamos la conexión a la base de datos
-# conn = pyodbc.connect(driver='SQL Server;',
-#                       host='34.170.174.91;',
-#                       database='grupo7;',
-#                       uid='henry;',
-#                       pwd='CERtificado14',
-#                       TrustServerCertificate='yes;')
+conn = pyodbc.connect(driver='SQL Server;',
+                      host='34.170.174.91;',
+                      database='grupo7;',
+                      uid='henry;',
+                      pwd='CERtificado14',
+                      TrustServerCertificate='yes;')
 
-# cursor = conn.cursor()                              #Definimos el cursor
+cursor = conn.cursor()                              #Definimos el cursor
 
 #Importamos todo el dataset de reviews completo
 reviews = pd.read_pickle('D:/Marcos/HENRY/Proyecto-Final/reviews_finales/reviews_ml.pkl')
@@ -91,14 +91,14 @@ if tipo_recomendacion == 'Recomendación por usuario':
                 restaurants_recom = restaurants_est[restaurants_est['Id_Restaurant'].isin(mejores_pred['Restaurant_Id'].values)]
             st.write('Le recomendamos los siguientes restaurants:')
             st.dataframe(restaurants_recom[['Id_Restaurant','Nombre','Tipo']].reset_index(drop=True))
-            # for i in range(restaurants_recom.shape[0]):            
-            #     cursor.execute('INSERT INTO historial_busqueda (HB_Timestamp, HB_TipoRec, HB_RestId, HB_RestNombre, HB_RestTipo) VALUES(?,?,?,?,?)',
-            #                 int(datetime.datetime.now().timestamp()),
-            #                 tipo_recomendacion,
-            #                 restaurants_recom['Id_Restaurant'].values[i],
-            #                 restaurants_recom['Nombre'].values[i],
-            #                 restaurants_recom['Tipo'].values[i])
-            # cursor.commit()
+            for i in range(restaurants_recom.shape[0]):            
+                cursor.execute('INSERT INTO historial_busqueda (HB_Timestamp, HB_TipoRec, HB_RestId, HB_RestNombre, HB_RestTipo) VALUES(?,?,?,?,?)',
+                            int(datetime.datetime.now().timestamp()),
+                            tipo_recomendacion,
+                            restaurants_recom['Id_Restaurant'].values[i],
+                            restaurants_recom['Nombre'].values[i],
+                            restaurants_recom['Tipo'].values[i])
+            cursor.commit()
 else:
     tipo_rest = st.selectbox('Ingrese tipo de restaurant:',options=list(restaurants_est['Tipo'].unique()))
     buscar_tipo = st.button('Buscar')
@@ -107,16 +107,16 @@ else:
         recomendaciones_tipo = restaurants_tipo[['Id_Restaurant','Nombre','Tipo']].reset_index(drop=True).head()
         st.write('Le recomendamos los siguientes restaurants:')
         st.dataframe(recomendaciones_tipo)
-        # for i in range(5):            
-        #     cursor.execute('INSERT INTO historial_busqueda (HB_Timestamp, HB_TipoRec, HB_RestId, HB_RestNombre, HB_RestTipo) VALUES(?,?,?,?,?)',
-        #                 int(datetime.datetime.now().timestamp()),
-        #                 tipo_recomendacion,
-        #                 recomendaciones_tipo['Id_Restaurant'].values[i],
-        #                 recomendaciones_tipo['Nombre'].values[i],
-        #                 recomendaciones_tipo['Tipo'].values[i])
-        # cursor.commit()
+        for i in range(5):            
+            cursor.execute('INSERT INTO historial_busqueda (HB_Timestamp, HB_TipoRec, HB_RestId, HB_RestNombre, HB_RestTipo) VALUES(?,?,?,?,?)',
+                        int(datetime.datetime.now().timestamp()),
+                        tipo_recomendacion,
+                        recomendaciones_tipo['Id_Restaurant'].values[i],
+                        recomendaciones_tipo['Nombre'].values[i],
+                        recomendaciones_tipo['Tipo'].values[i])
+        cursor.commit()
 
 #Mostramos el historial de búsqueda. Sacar luego.
-# hist_busqueda = st.checkbox('Mostrar historial de búsqueda')
-# if hist_busqueda:
-#     st.dataframe(pd.read_sql('SELECT * FROM historial_busqueda',conn))
+hist_busqueda = st.checkbox('Mostrar historial de búsqueda')
+if hist_busqueda:
+    st.dataframe(pd.read_sql('SELECT * FROM historial_busqueda',conn))
