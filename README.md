@@ -76,7 +76,7 @@ El contenido del proyecto donde se encuentran las carpetas y/o archivos correspo
    
 - **Python:** Se utilizó Python y sus librerías para realizar el proyecto en tareas como:<br>
       ETL / EDA: Se utilizó Pandas y Matplotlib.<br>
-      Machine Learning: Se utilizó scikit-learn.
+      Machine Learning: Se utilizó SciKit para Surprise.
    
 - **LucidChart:** Herramienta de diagramación basada en la web, que permite a los usuarios colaborar y trabajar juntos en tiempo real.
    
