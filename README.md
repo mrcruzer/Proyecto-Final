@@ -65,7 +65,7 @@ El contenido del proyecto donde se encuentran las carpetas y/o archivos correspo
 
 ## Dashboard
 <div style="display:flex;">
-    <img src="https://github.com/marcoslarran/Proyecto-Final/blob/main/assets/db1.jpg" alt="Imagen 1"">
+    <img src="https://github.com/marcoslarran/Proyecto-Final/blob/main/assets/db1.jpg" alt="Imagen 1">
     <img src="https://github.com/marcoslarran/Proyecto-Final/blob/main/assets/db2.jpg" alt="Imagen 2">
 </div>
 
@@ -107,3 +107,5 @@ Con estos elementos, la información nos ayudará a conocer:
    
 Todo ello nos permitirá ser más competitivos, adaptarnos rápido a las tendencias y pensar en experiencias nuevas para el cliente basado en sus elecciones.
 
+#### Disclaimer
+   Este proyecto es solo para fines educativos y de aprendizaje. Todas las imágenes utilizadas en este proyecto son para fines ilustrativos y no representan una situación real. Se pretende que el proyecto no tenga ningún otro propósito mas que el aprendizaje y la práctica de habilidades técnicas.
