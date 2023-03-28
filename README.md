@@ -63,7 +63,7 @@ El contenido del proyecto donde se encuentran las carpetas y/o archivos correspo
 * **Procesamiento_lenguaje_natural:** Carpeta donde se muestra el procesamiento de los textos de los comentarios realizados en las reseñas. [Acceder aquí](https://github.com/marcoslarran/Proyecto-Final/tree/main/Procesamiento_lenguaje_natural)
 
 
-## KPI's
+## Dashboard
 ...
 
    
