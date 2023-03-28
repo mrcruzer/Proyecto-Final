@@ -44,7 +44,8 @@ La industria restaurantera ha tenido un crecimiento interesante en los Estados U
    
   
 ## Flujo de trabajo
-...
+ <img src="https://github.com/marcoslarran/Proyecto-Final/blob/main/assets/Workflow.png" alt="Workflow">
+
 
 ## Contenido
 
