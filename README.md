@@ -9,7 +9,7 @@ Somos G7 Consulting Services, consultora especializada en análisis de datos y m
 - [Problemáticas](#problemáticas)
 - [Flujo de trabajo](#flujo-de-trabajo)
 - [Contenido](#contenido)
-- [KPI's](#kpis)
+- [Dashboard](#dashboard)
 - [Stack Tecnológico](#stack-tecnológico)
 - [Conclusiónes](#conclusiónes)
 
