@@ -64,7 +64,16 @@ El contenido del proyecto donde se encuentran las carpetas y/o archivos correspo
 
 
 ## Dashboard
-...
+<div style="display:flex;">
+    <img src="https://github.com/marcoslarran/Proyecto-Final/blob/main/assets/db1.jpg" alt="Imagen 1"">
+    <img src="https://github.com/marcoslarran/Proyecto-Final/blob/main/assets/db2.jpg" alt="Imagen 2">
+</div>
+
+<div style="display:flex;">
+    <img src="https://github.com/marcoslarran/Proyecto-Final/blob/main/assets/db3.jpg" alt="Imagen 3">
+    <img src="https://github.com/marcoslarran/Proyecto-Final/blob/main/assets/db4.jpg" alt="Imagen 4">
+</div>
+
 
    
 ## Stack Tecnológico
