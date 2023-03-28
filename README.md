@@ -51,11 +51,8 @@ La industria restaurantera ha tenido un crecimiento interesante en los Estados U
 
 El contenido del proyecto donde se encuentran las carpetas y/o archivos correspondientes.
 
-* **primera aproximacion.ipynb:** Notebook con el código realizado para el primer acercamiento a la data con el objetivo de explorar como venían los datos, en que formato, etc.
+* **Planeacion:** Carpeta que contiene los archivos de planeación del proyecto asi como el diccionario de datos. [Acceder aquí](https://github.com/marcoslarran/Proyecto-Final/tree/main/Planeaci%C3%B3n))
 
-* **Planeacion:** Carpeta que contiene los archivos de planeación del proyecto. [Acceder aquí](https://github.com/marcoslarran/Proyecto-Final/tree/main/Planeaci%C3%B3n))
-
-* **Diccionario de Datos.pdf:** Documento con la infromación del tipo de datos que contiene cada archivo con el que se va a trabajar.
 
 * **transformaciones:** Carpeta donde se encuentran 5 archivos donde se realizan transformaciónes en los datasets con su respectivo README explicativo. [Acceder aquí](https://github.com/marcoslarran/Proyecto-Final/tree/main/transformaciones)
 
@@ -63,9 +60,7 @@ El contenido del proyecto donde se encuentran las carpetas y/o archivos correspo
 
 * **sistema_recomendación:** Carpeta donde se encuentran 2 archivo para el desarrollo del sistema de recomendación (seleccion de data, optimización de hiperparámetros, etc). [Acceder aquí](https://github.com/marcoslarran/Proyecto-Final/tree/main/sistema_recomendaci%C3%B3n)
 
-* **Procesamiento_Reseñas.ipynb:** Notebook donde se muestra el procesamiento de los textos de los comentarios realizados en las reseñas.
-
-* **Analisis_exploratorio_de_datos.ipynb:** Notebook donde se muestra el análisis exploratorio para ingestar en el modelo de Machine Learning "buenos" datos.
+* **Procesamiento_lenguaje_natural:** Carpeta donde se muestra el procesamiento de los textos de los comentarios realizados en las reseñas. [Acceder aquí](https://github.com/marcoslarran/Proyecto-Final/tree/main/sistema_recomendaci%C3%B3n)
 
 
 ## KPI's
