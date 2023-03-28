@@ -4,19 +4,26 @@ from surprise import Reader,Dataset
 from surprise.model_selection import train_test_split
 from surprise.prediction_algorithms.matrix_factorization import SVD
 from surprise import accuracy
+import datetime
+import pyodbc
 
 st.title('Sistema de recomendación de restaurants')
 
+#Realizamos la conexión a la base de datos
+conn = pyodbc.connect(driver='SQL Server;',
+                      host='34.170.174.91;',
+                      database='grupo7;',
+                      uid='henry;',
+                      pwd='CERtificado14',
+                      TrustServerCertificate='yes;')
+
+cursor = conn.cursor()                              #Definimos el cursor
+
 #Importamos todo el dataset de reviews completo
-for i in range(1,10):
-    if i == 1:
-        reviews = pd.read_csv('D:/Marcos/HENRY/Proyecto-Final/reviews_finales/reviews_1.csv',sep=';',escapechar='\\')
-    else:
-        reviews = pd.concat([reviews,pd.read_csv('D:/Marcos/HENRY/Proyecto-Final/reviews_finales/reviews_'+str(i)+'.csv',
-                                                 sep=';',escapechar='\\')],ignore_index=True)
+reviews = pd.read_pickle('D:/Marcos/HENRY/Proyecto-Final/reviews_finales/reviews_ml.pkl')
 
 #Importamos el dataset de restaurants
-restaurants = pd.read_csv('D:/Marcos/HENRY/Proyecto-Final/restaurants_homolog.csv')
+restaurants = pd.read_csv('D:/Marcos/HENRY/Proyecto-Final/restaurants_homolog.csv',index_col=0)
 
 #Definimos listas de estados y códigos
 state_codes = {'Alabama': 'AL','Alaska': 'AK','Arizona': 'AZ','Arkansas': 'AR','California': 'CA','Colorado': 'CO','Connecticut': 'CT',
@@ -66,24 +73,50 @@ if tipo_recomendacion == 'Recomendación por usuario':
         st.markdown('#### El modelo no pudo entrenarse correctamente')
     else:
         usuario = st.selectbox('Ingrese su Id de usuario:',options=list(reviews_est_filt['Id_Usuario'].unique()))
-        restaurants_ya_visitados = list(reviews_est_filt[reviews_est_filt['Id_Usuario']==usuario]['Id_Restaurant'].unique())
-        restaurants_posibles = reviews_est_filt[~reviews_est_filt['Id_Restaurant'].isin(restaurants_ya_visitados)]['Id_Restaurant'].unique()
-        lista_rest = []
-        lista_calif = []
-        for r in restaurants_posibles:
-            lista_rest.append(model.predict(usuario,r).iid)
-            lista_calif.append(model.predict(usuario,r).est)
-        diccionario = {'Restaurant_Id':lista_rest,'Rating_pred':lista_calif}
-        predicciones_df = pd.DataFrame(diccionario)
-        mejores_pred = predicciones_df[predicciones_df['Rating_pred']>3].sort_values(by='Rating_pred')
-        if mejores_pred.shape[0]>5:
-            restaurants_recom = restaurants_est[restaurants_est['Id_Restaurant'].isin(mejores_pred.iloc[:5]['Restaurant_Id'].values)]
-        else:
-            restaurants_recom = restaurants_est[restaurants_est['Id_Restaurant'].isin(mejores_pred['Restaurant_Id'].values)]
-        st.write('Le recomendamos los siguientes restaurants:')
-        st.dataframe(restaurants_recom[['Nombre','Tipo']].reset_index(drop=True))
+        buscar_us = st.button('Buscar')
+        if buscar_us:
+            restaurants_ya_visitados = list(reviews_est_filt[reviews_est_filt['Id_Usuario']==usuario]['Id_Restaurant'].unique())
+            restaurants_posibles = reviews_est_filt[~reviews_est_filt['Id_Restaurant'].isin(restaurants_ya_visitados)]['Id_Restaurant'].unique()
+            lista_rest = []
+            lista_calif = []
+            for r in restaurants_posibles:
+                lista_rest.append(model.predict(usuario,r).iid)
+                lista_calif.append(model.predict(usuario,r).est)
+            diccionario = {'Restaurant_Id':lista_rest,'Rating_pred':lista_calif}
+            predicciones_df = pd.DataFrame(diccionario)
+            mejores_pred = predicciones_df[predicciones_df['Rating_pred']>3].sort_values(by='Rating_pred',ascending=False)
+            if mejores_pred.shape[0]>5:
+                restaurants_recom = restaurants_est[restaurants_est['Id_Restaurant'].isin(mejores_pred.iloc[:5]['Restaurant_Id'].values)]
+            else:
+                restaurants_recom = restaurants_est[restaurants_est['Id_Restaurant'].isin(mejores_pred['Restaurant_Id'].values)]
+            st.write('Le recomendamos los siguientes restaurants:')
+            st.dataframe(restaurants_recom[['Id_Restaurant','Nombre','Tipo']].reset_index(drop=True))
+            for i in range(restaurants_recom.shape[0]):            
+                cursor.execute('INSERT INTO historial_busqueda (HB_Timestamp, HB_TipoRec, HB_RestId, HB_RestNombre, HB_RestTipo) VALUES(?,?,?,?,?)',
+                            int(datetime.datetime.now().timestamp()),
+                            tipo_recomendacion,
+                            restaurants_recom['Id_Restaurant'].values[i],
+                            restaurants_recom['Nombre'].values[i],
+                            restaurants_recom['Tipo'].values[i])
+            cursor.commit()
 else:
     tipo_rest = st.selectbox('Ingrese tipo de restaurant:',options=list(restaurants_est['Tipo'].unique()))
-    restaurants_tipo = restaurants_est[restaurants_est['Tipo']==tipo_rest].sort_values(by='Rating_promedio')
-    st.write('Le recomendamos los siguientes restaurants:')
-    st.dataframe(restaurants_tipo[['Nombre','Tipo']].reset_index(drop=True).head())
+    buscar_tipo = st.button('Buscar')
+    if buscar_tipo:
+        restaurants_tipo = restaurants_est[restaurants_est['Tipo']==tipo_rest].sort_values(by='Rating_promedio',ascending=False)
+        recomendaciones_tipo = restaurants_tipo[['Id_Restaurant','Nombre','Tipo']].reset_index(drop=True).head()
+        st.write('Le recomendamos los siguientes restaurants:')
+        st.dataframe(recomendaciones_tipo)
+        for i in range(5):            
+            cursor.execute('INSERT INTO historial_busqueda (HB_Timestamp, HB_TipoRec, HB_RestId, HB_RestNombre, HB_RestTipo) VALUES(?,?,?,?,?)',
+                        int(datetime.datetime.now().timestamp()),
+                        tipo_recomendacion,
+                        recomendaciones_tipo['Id_Restaurant'].values[i],
+                        recomendaciones_tipo['Nombre'].values[i],
+                        recomendaciones_tipo['Tipo'].values[i])
+        cursor.commit()
+
+#Mostramos el historial de búsqueda. Sacar luego.
+hist_busqueda = st.checkbox('Mostrar historial de búsqueda')
+if hist_busqueda:
+    st.dataframe(pd.read_sql('SELECT * FROM historial_busqueda',conn))
