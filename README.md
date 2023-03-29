@@ -16,7 +16,10 @@ Somos G7 Consulting Services, consultora especializada en análisis de datos y m
 
 ## Contexto
 
-La industria restaurantera ha tenido un crecimiento interesante en los Estados Unidos, principalmente la que se refiere a la comida asiática, que ha tenido mayor popularidad debido al uso de especias y picantes, así como al creciente numero de inmigrantes y el espíritu aventurero del paladar norteamericano. En este sentido, fuimos contratados por el grupo restaurantero de comida, que desea un análisis detallado de la opinión de los usuarios, utilizando análisis de sentimientos, y sistemas de recomendación para el usuario basados en experiencias previas.
+La industria restaurantera ha experimentado un crecimiento significativo en los últimos años, gracias a la diversidad cultural en los Estados Unidos y el aumento del interés por nuevas experiencias gastronómicas. Cada vez es más común encontrar restaurantes que ofrecen una amplia variedad de platillos de diferentes partes del mundo.<br>En este contexto, hemos sido contratados por un grupo restaurantero para llevar a cabo un análisis detallado de la opinión de los usuarios y utilizar sistemas de recomendación basados en experiencias previas.<br><br>
+Para llevar a cabo este análisis, hemos utilizado herramientas de análisis de sentimientos para evaluar las opiniones y comentarios de los usuarios en plataformas de reseñas. A través de esta evaluación, hemos identificado los aspectos que los usuarios valoran más en los restaurantes.<br><br>
+Además, hemos desarrollado sistemas de recomendación basados en las experiencias previas de los usuarios. Utilizando algoritmos de aprendizaje automático, estos sistemas son capaces de identificar los restaurantes y experiencias que son más adecuadas para cada usuario en particular.<br><br>
+Ya finalizando, en resumen, la industria restaurantera está experimentando un gran auge en los Estados Unidos, y las herramientas de análisis de sentimientos y los sistemas de recomendación pueden ayudar a los restaurantes a entender mejor las necesidades y preferencias de los usuarios.
    
  ## Problemáticas
  
