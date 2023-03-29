@@ -4,7 +4,8 @@ import pandas as pd
 import wbgapi as wb
 import yfinance as yf
 import numpy as np
-# import folium
+import matplotlib.pyplot as plt
+import folium
 from streamlit_folium import folium_static
 from datetime import datetime
 import re
@@ -33,7 +34,7 @@ estados = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Conn
            'Tennessee', 'Texas', 'Utah','Vermont', 'Virginia', 'Washington', 'West_Virginia', 'Wisconsin', 'Wyoming', 'Todos']
 
 #Importamos los DF a utilizar. Cuidar que no se excedan de 200 MB porque es el límite de Streamlit
-reviews= pd.read_csv('C:/Users/Manuel/Documents/Henry/PG_Google_Yelp/Normalizacion/reviews_filtro.csv',sep=';',escapechar='\\')
+#reviews= pd.read_csv('C:/Users/Manuel/Documents/Henry/PG_Google_Yelp/Normalizacion/Comida Italiana.csv',sep=';',escapechar='\\')
 restaurants = pd.read_csv('C:/Users/Manuel/Documents/Henry/PG_Google_Yelp/Normalizacion/restaurants_homolog.csv', index_col=0)
 
 
@@ -106,14 +107,19 @@ restaurants_fs = filtro_restaurante_id(restaurants_fc, slide_sucursal)
 st.markdown("<h3 style='text-align: center; color: orange;'>¡Mapa de distribución!</h3>", unsafe_allow_html=True)
 
 #** Este bloque muestra un mapa de ubicaciones, es interesante, pero se satura mucho por la cantidad de restaurantes.
-# Crear un mapa centrado en las coordenadas del primer restaurante
+#Crear un mapa centrado en las coordenadas del primer restaurante
 # m = folium.Map(location=[restaurants_fs.iloc[0]['Latitud'], restaurants_fs.iloc[0]['Longitud']], zoom_start=12)
 # # Agregar un marcador para cada restaurante
 # for i, row in restaurants_fs.iterrows():
 #     folium.Marker([row['Latitud'], row['Longitud']], popup=row['Nombre']).add_to(m)
 # folium_static(m) # Mostrar el mapa en Streamlit
 
-df_map = restaurants_fs.loc[:, ['Latitud', 'Longitud']]
+map_rest1 = pd.read_csv("C:/Users/Manuel/Documents/Henry/PG_Google_Yelp/Tablero/pages/datasets/restaurants_mapa.csv")
+map_rest2 = filtro_restaurante_estado(map_rest1, estado_cod)
+map_rest = filtro_restaurante_tipo(map_rest2, slide_tipo)
+
+#df_map = restaurants_fs.loc[:, ['Latitud', 'Longitud']]
+df_map = map_rest.loc[:, ['Latitud', 'Longitud']]
 df_map = df_map.rename(columns={'Latitud': 'LAT', 'Longitud': 'LON'})
 st.map(df_map)
 
@@ -133,275 +139,291 @@ f"Sucursales del restaurante {slide_restaurant}: {restaurants_fs.shape[0]}" #lí
 #-----------------------------------------Inicio Análisis de Reseñas-----------------------------------------------
 st.markdown("<h2 style='text-align: center; color: orange;'>Reseñas</h2>", unsafe_allow_html=True)
 # -------Filtro del DF--------
+if slide_tipo == "Todos":
+    st.warning('Por favor, seleccione un tipo de comida específico, ya que por el momento no es posible cargar todos los tipos de comida', icon="ℹ️")
+else: 
+    reviews= pd.read_csv(f'C:/Users/Manuel/Documents/Henry/PG_Google_Yelp/Normalizacion/{slide_tipo}.csv',sep=';',escapechar='\\')
+    reviews_fe = filtro_restaurante_estado(reviews, estado_cod)
+    reviews_ft = filtro_restaurante_tipo(reviews_fe, slide_tipo)
+    reviews_fn = filtro_restaurante_nombre(reviews_ft, slide_restaurant)
+    reviews_fc = filtro_restaurante_ciudad(reviews_fn, slide_ciudad)
+    reviews_fs = filtro_restaurante_id(reviews_fc, slide_sucursal)
 
-#Para el DF de reseñas, solo se puede filtrar por periodo de tiempo
-reviews["Timestamp"] = pd.to_datetime(reviews["Timestamp"]) #Se pone a formato fecha
-fecha1=pd.to_datetime(reviews['Timestamp'].min()) #Definimos la fecha menor
-fecha2=pd.to_datetime(reviews['Timestamp'].max()) #Definimos la fecha mayor
-# Gráfico del filtro de fecha
-filtro_fecha = st.slider("Selecciones periodo a revisar", value=(datetime(fecha1.year, fecha1.month,fecha1.day),datetime(fecha2.year, fecha2.month,fecha2.day)))
+    #Para el DF de reseñas, solo se puede filtrar por periodo de tiempo
+    if reviews_fs.empty:    
+        st.warning('No existen reseñas para los filtros seleccionados.', icon="ℹ️")  
+    else:
+        reviews_fs["Timestamp"] = pd.to_datetime(reviews_fs["Timestamp"]) #Se pone a formato fecha
+        fecha1=pd.to_datetime(reviews_fs['Timestamp'].min()) #Definimos la fecha menor
+        fecha2=pd.to_datetime(reviews_fs['Timestamp'].max()) #Definimos la fecha mayor
 
-# Aplicación del Filtro sobre el DF (creación de nueva variable)
-resenias = reviews[(reviews["Timestamp"] >= filtro_fecha[0]) & (reviews["Timestamp"] <= filtro_fecha[1])]
+    # Gráfico del filtro de fecha
+        filtro_fecha = st.slider("Selecciones periodo a revisar", value=(datetime(fecha1.year, fecha1.month,fecha1.day),datetime(fecha2.year, fecha2.month,fecha2.day)))
 
-anio_inicio = filtro_fecha[0].strftime("%Y")
-mes_inicio = filtro_fecha[0].strftime("%m")
-dia_inicio = filtro_fecha[0].strftime("%d")
-anio_fin = filtro_fecha[1].strftime("%Y")
-mes_fin = filtro_fecha[1].strftime("%m")
-dia_fin = filtro_fecha[1].strftime("%d")
-periodo = f"del {anio_inicio}-{mes_inicio}-{dia_inicio} al {anio_fin}-{mes_fin}-{dia_fin}"
-# periodo # línea de control para ver el texto del periodo para los gráficos
+        # Aplicación del Filtro sobre el DF (creación de nueva variable)
+        resenias = reviews_fs[(reviews_fs["Timestamp"] >= filtro_fecha[0]) & (reviews_fs["Timestamp"] <= filtro_fecha[1])]
 
-
-# Creamos la función que filtrará las reseñas que tienen que ver con los DF filtrados previamente
-# Aquí iría el código de SQL server para definir el nuevo DF
-
-reviews_filtradas = resenias.merge(restaurants_fs[["Id_Restaurant","Nombre","Tipo","Estado","Ciudad"]],on="Id_Restaurant", how="inner")
-
-# reviews_filtradas línea de control para revisar el filtro
-
-#--------- Proceso de reseñas ----------
-stopwords = nltk.corpus.stopwords.words('english')
-
-#Le agregamos algunos adjetivos que no nos van a brindar informacion alguna (se puede ir actualizando)
-agregar_a_sw = ['good','bad','awesome','awfull','love','like','well','ok','get','back','never','one','two','three',
-                'four','five','go','would','got','said','us','came','ask','told','went','better','worst','always']
-for p in agregar_a_sw:
-    stopwords.append(p)
-
-#Definimos funcion con todas las operaciones a realizar para cualquier valor de rating
-@st.cache_data
-def procesamientoResenas (dataframe,rating:int):
-    df = dataframe[dataframe['Rating']==rating]
-    df.reset_index(inplace=True,drop=True)
-    reseñas_procesadas = []
-    for i in range(df.shape[0]):
-        texto1 = re.sub("[^a-zA-Z]"," ",str(df['Reseña'].values[i]))
-        texto2 = nltk.tokenize.word_tokenize(texto1.lower())
-        lista = [word for word in texto2 if word not in stopwords]
-        reseñas_procesadas += lista
-    frec_palabras = nltk.FreqDist(reseñas_procesadas)
-    frec_palabras_df = pd.DataFrame(list(frec_palabras.items()), columns = ["Palabra","Frequencia"])
-    return frec_palabras_df.sort_values(by='Frequencia',ascending=False)
-
-#-------- Definimos tablas de reseñas---------------
-#Hacemos una copia del DF de reseñas filtradas, pero solo extraemos las columnas que interesan para el proceso
-reseniasypuntaje= reviews_filtradas[["Rating","Reseña"]].copy()
-
-#Aplicamos la función para obtener reseñas positivas con 5 puntos
-res_positivas = procesamientoResenas(reseniasypuntaje,5)
-tot_res_pos=res_positivas['Frequencia'].sum() #Identificamos cuántas son
-
-#Aplicamos la función para obtener reseñas negativas con 1, 2 y 3 puntos. 
-res_negativas1 = procesamientoResenas(reseniasypuntaje,1)
-res_negativas2 = procesamientoResenas(reseniasypuntaje,2)
-res_negativas3 = procesamientoResenas(reseniasypuntaje,3)
-res_negativas = pd.concat([res_negativas1,res_negativas2,res_negativas3], axis=0, ignore_index=True)
-tot_res_neg = res_negativas1['Frequencia'].sum() + res_negativas2['Frequencia'].sum() + res_negativas3['Frequencia'].sum()
-
-#Condicionamos el KPI si no tiene reseñas positivas o negativas, enviar un mensaje. Ya que división entre cero no es posible.
-if tot_res_pos == 0 and tot_res_neg ==0:    
-    st.warning(f"El restaurante: '{slide_restaurant}'; en el Estado de {estado}, no cuenta con reseñas para evaluar.", icon="ℹ️")
-elif tot_res_neg == 0:
-    st.warning(f"El restaurante: '{slide_restaurant}'; en el Estado de {estado}, no cuenta con reseñas negativas. Todas son positivas ¡F e l i c i d a d e s!.")
-else: #Si hay datos, se procede a elaborar el gráfico para el indicador.
-    fig_kpi1 = go.Figure(go.Indicator(
-        mode = "gauge+number+delta",
-        value = tot_res_pos / tot_res_neg,
-        domain = {'x': [1, 0], 'y': [1, 0]},
-        title = {'text': f"Indice de Reseñas Positivas <br> {periodo}", 'font': {'size': 24,'color':"orange"}},
-        delta = {'reference': 1.5, 'increasing': {'color': "orange"}},
-        gauge = {
-            'axis': {'range': [None, 3], 'tickwidth': 1, 'tickcolor': "orange"},
-            'bar': {'color': "orange"},
-            'bgcolor': "yellow",
-            'borderwidth': 2,
-            'bordercolor': "gray",
-            'steps': [
-                {'range': [0, 1], 'color': '#FD5752'},
-                {'range': [1, 1.5], 'color': '#FAFD52'},
-                {'range': [1.5, 3], 'color': '#ABD758'}],
-            'threshold': {
-                'line': {'color': "red", 'width': 4},
-                'thickness': 0.75,
-                'value': 1.5}}))
-    fig_kpi1.update_layout(width = 420, height = 320, font = {'family': "Arial"})
-    col1, col2, col3, col4, col5 = st.columns(5) #Se utiliza este línea para acomodar al centro el gráfico al disminuirlo de tamaño
-    with col2:        
-        st.plotly_chart(fig_kpi1, config={"displayModeBar": False, "responsive": True})
-
-#*******************Dashboard Reseñas
+        anio_inicio = filtro_fecha[0].strftime("%Y")
+        mes_inicio = filtro_fecha[0].strftime("%m")
+        dia_inicio = filtro_fecha[0].strftime("%d")
+        anio_fin = filtro_fecha[1].strftime("%Y")
+        mes_fin = filtro_fecha[1].strftime("%m")
+        dia_fin = filtro_fecha[1].strftime("%d")
+        periodo = f"del {anio_inicio}-{mes_inicio}-{dia_inicio} al {anio_fin}-{mes_fin}-{dia_fin}"
+        # periodo # línea de control para ver el texto del periodo para los gráficos
 
 
-# f"Cantidad de registros sin filtrar: {resenias.shape[0]}" #Línea de control para ver las reseñas sin filtro
-# f"Cantidad de registros filtrados por tipo y estado: {reviews_filtradas.shape[0]}" #Línea de control para ver las reseñas con filtro
-# f"Estado de Código: {estado_cod}, tipo: {type(estado_cod)}" #Línea de control para ver el códgio del Estado que esta seleccionado
-# st.dataframe(reviews_filtradas) #Prueba para ver el DF reseñas que se carga (este se puede eliminar del dashboard)
-# f"Reseñas positivas totales 5: {tot_res_pos}" #Línea de control
-# f"Reseñas negativas totales 1: {res_negativas1['Frequencia'].sum()}" #Línea de control
-# f"Reseñas negativas totales 2: {res_negativas2['Frequencia'].sum()}" #Línea de control
-# f"Reseñas negativas totales3: {res_negativas3['Frequencia'].sum()}" #Línea de control
-# f"Total reseñas negativas 1,2,3: {tot_res_neg}" #Línea de control
+        # Creamos la función que filtrará las reseñas que tienen que ver con los DF filtrados previamente
+        # Aquí iría el código de SQL server para definir el nuevo DF
 
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.write(f"Reseñas negativas: {res_negativas.head(5)['Frequencia'].sum()}")
-    st.dataframe(res_negativas.head(5)) #Se muestra sólo las 5 reseñas con más elementos negativos            
-with col3:
-    st.write(f"Reseñas positivas: {res_positivas.head(5)['Frequencia'].sum()}")
-    st.dataframe(res_positivas.head(5)) #Se muestra sólo las 5 reseñas con más elementos positivos
-
-
-col1,col2,col3 = st.columns(3)
-with col1:
-    if st.button('Ver reseñas negativas'):
-        info_res_neg1= reseniasypuntaje.loc[(reseniasypuntaje['Rating'].isin([1, 2])) & (reseniasypuntaje['Reseña'].str.contains(res_negativas["Palabra"][0]))]
-        info_res_neg2= reseniasypuntaje.loc[(reseniasypuntaje['Rating'].isin([1, 2])) & (reseniasypuntaje['Reseña'].str.contains(res_negativas["Palabra"][1]))]
-        info_res_neg3= reseniasypuntaje.loc[(reseniasypuntaje['Rating'].isin([1, 2])) & (reseniasypuntaje['Reseña'].str.contains(res_negativas["Palabra"][2]))]
-        info_res_neg4= reseniasypuntaje.loc[(reseniasypuntaje['Rating'].isin([1, 2])) & (reseniasypuntaje['Reseña'].str.contains(res_negativas["Palabra"][3]))]
-        info_res_neg5= reseniasypuntaje.loc[(reseniasypuntaje['Rating'].isin([1, 2])) & (reseniasypuntaje['Reseña'].str.contains(res_negativas["Palabra"][4]))]
-        informe_negativo = pd.concat([info_res_neg1["Reseña"],info_res_neg2["Reseña"],info_res_neg3["Reseña"],info_res_neg4["Reseña"],info_res_neg5["Reseña"]])
-        #Borrar duplicado
-
-        informe_negativo2= reseniasypuntaje.loc[(reseniasypuntaje['Rating'].isin([1, 2,3]))]
-        informe_negativo2
-with col3:
-    if st.button('Ver reseñas positivas'):
-        # info_res_pos1 = reseniasypuntaje[(reseniasypuntaje['Reseña'].str.contains(res_positivas["Palabra"][0])) & (reseniasypuntaje['Rating'] == 5)]
-        # info_res_pos2 = reseniasypuntaje[(reseniasypuntaje['Reseña'].str.contains(res_positivas["Palabra"][1])) & (reseniasypuntaje['Rating'] == 5)]
-        # info_res_pos3 = reseniasypuntaje[(reseniasypuntaje['Reseña'].str.contains(res_positivas["Palabra"][2])) & (reseniasypuntaje['Rating'] == 5)]
-        # info_res_pos4 = reseniasypuntaje[(reseniasypuntaje['Reseña'].str.contains(res_positivas["Palabra"][3])) & (reseniasypuntaje['Rating'] == 5)]
-        # info_res_pos5 = reseniasypuntaje[(reseniasypuntaje['Reseña'].str.contains(res_positivas["Palabra"][4])) & (reseniasypuntaje['Rating'] == 5)]
-        # informe_positivo = pd.concat([info_res_pos1["Reseña"],info_res_pos2["Reseña"],info_res_pos3["Reseña"],info_res_pos4["Reseña"],info_res_pos5["Reseña"]],axis=0,ignore_index=True)
-        informe_positivo2 = reseniasypuntaje[(reseniasypuntaje['Rating'] == 5)]
-        informe_positivo2
-        #informe_positivo
-
-#-----------------------------------------Fin Análisis de Reseñas-----------------------------------------------
+        reviews_filtradas = resenias.dropna(subset=["Reseña"])
 
 
 
+        #reviews_filtradas #línea de control para revisar el filtro
 
-#-----------------------------------------Inicio Análisis de Puntuaciones-----------------------------------------------
-st.markdown("<h2 style='text-align: center; color: orange;'>Puntuaciones</h2>", unsafe_allow_html=True)
-rating = reviews_filtradas.copy() #Generamos una copia para no afectar los demás DF
-rating
+        #--------- Proceso de reseñas ----------
+        stopwords = nltk.corpus.stopwords.words('english')
 
-if rating.empty:    
-    st.warning('No existen puntuaciones para los filtros seleccionados.', icon="ℹ️")    
-else:
-    df_rating = rating.groupby('Rating')["Id_Usuario"].nunique()
-    positivo = 0
-    negativo = 0
-    for i in df_rating.index:
-        if i == 5:
-            positivo = df_rating[i]
-        elif i == 3 or i== 2 or i == 1:
-            negativo += df_rating[i]
+        #Le agregamos algunos adjetivos que no nos van a brindar informacion alguna (se puede ir actualizando)
+        agregar_a_sw = ['good','bad','awesome','awfull','love','like','well','ok','get','back','never','one','two','three',
+                        'four','five','go','would','got','said','us','came','ask','told','went','better','worst','always',"nan"]
+        for p in agregar_a_sw:
+            stopwords.append(p)
 
-    promotores = round(positivo / df_rating.sum() * 100,2) #porcentaje de promotores
-    detractores = round(negativo / df_rating.sum() * 100,2) #porcentaje de detractores
-    nps = promotores - detractores
-    
-    #Graficamos el resultado. Nota: HAY QUE REVISAR SI SE REQUIERE CONDICIONAR EL GRÁFICO.
-    fig_kpi2 = go.Figure(go.Indicator(
-        mode = "gauge+number+delta",
-        value = nps,
-        domain = {'x': [1, 0], 'y': [1, 0]},
-        title = {'text': "Porcentaje Red de Promotores", 'font': {'size': 24, 'color':"orange"}},
-        delta = {'reference': 30, 'increasing': {'color': "orange"}},
-        gauge = {
-            'axis': {'range': [-100, 100], 'tickwidth': 3, 'tickcolor': "orange"},
-            'bar': {'color': "orange"},
-            'bgcolor': "yellow",
-            'borderwidth': 2,
-            'bordercolor': "gray",
-            'steps': [
-                {'range': [-100, 0], 'color': '#FD5752'},
-                {'range': [0, 30], 'color': '#FAFD52'},
-                {'range': [30, 100], 'color': '#ABD758'}],
-            'threshold': {
-                'line': {'color': "red", 'width': 4},
-                'thickness': 0.75,
-                'value': 30}},
-        number = {'suffix': '%'}))
-    fig_kpi2.update_layout(width = 420, height = 320, font = {'family': "Arial"})
-    
-#---Gráfico de líneas para presentar el comportamiento de las reseñas a través del tiempo
-    gr_res_tiempo = rating[["Rating","Timestamp"]] #Seleccionamos solo las columnas que nos interesan
-    gr_res_tiempo["Timestamp"]= pd.to_datetime(gr_res_tiempo["Timestamp"]) #Cambiamos el formato de fecha
-    gr_res_tiempo = gr_res_tiempo.sort_values("Timestamp") #Ordenamos de manera ascendente
-    gr_res_tiempo = gr_res_tiempo.groupby(pd.Grouper(key='Timestamp', freq='M'))["Rating"].mean().reset_index() #agrupamos promedio puntaje por mes
-    
-#---Definir diccionario de correspondencia
-    meses_ingles = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-    meses_espanol = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
-    correspondencia_meses = dict(zip(meses_ingles, meses_espanol))
-    gr_res_tiempo["Mes"] = gr_res_tiempo["Timestamp"].dt.strftime("%B") # Definimos que sea por mes
-    gr_res_tiempo["Mes"] = gr_res_tiempo["Mes"].map(correspondencia_meses) #Cambiamos el idioma del mes
-    fig_res = px.line(gr_res_tiempo, x="Mes", y="Rating")
-#---Línea para dar formato a la gráfica.
-    fig_res.update_layout(
-    title={
-        'text': f"Promedio de puntuaciones <br> {periodo}",
-        'x':0.5, # Centrar el título
-        'xanchor': 'center' # Centrar el título
-            }, #'font': {'color': 'gray'}},
-       
-    xaxis_title="Mes",
-    yaxis_title="Puntuación",
-    font=dict(
-        family="Arial",
-        size=20,
-        color="black"),
-    plot_bgcolor='rgba(0,0,0,0)',width = 350, height=300)
-#Para poner subtitulo
-    # fig_res.add_annotation(  
-    # text=f"Periodo del {}",
-    # xref="paper",
-    # yref="paper",
-    # x=0,
-    # y=1.08,
-    # showarrow=False,
-    # font=dict(family="Arial", size=14, color="white"))
-    fig_res.update_traces(line_color='orange')
-    
-#---Gráfico de barras para mostrar la distribución
-    gr_puntuaciones = rating.groupby("Rating").size().reset_index(name='counts')    
-    gr_puntuaciones = gr_puntuaciones.sort_values(by='Rating', ascending=False) # Ordenar los valores de mayor a menor
-    fig_bar_puntuaciones = px.bar(gr_puntuaciones, x="counts", y="Rating", orientation='h', color_discrete_sequence=['#FFA500'])     # Crear el gráfico de barras
-    fig_bar_puntuaciones.update_layout( # Establecer el título y los títulos de los ejes
-        title={
-            'text': "Cantidad de puntuaciones por valor",
-            #'font': {'color': 'white'} ,
-            'x':0.5, # Centrar el título
-            'xanchor': 'center' # Centrar el título
-            },
-        xaxis_title="Cantidad de puntuaciones",
-        yaxis_title="Valor de puntuación",
-        font=dict(family="Arial", size=20, color="white"),
-        plot_bgcolor='rgba(0,0,0,0)', width = 300, height=350)
+        #Definimos funcion con todas las operaciones a realizar para cualquier valor de rating
+        @st.cache_data
+        def procesamientoResenas (dataframe,rating:int):
+            df = dataframe[dataframe['Rating']==rating]
+            df.reset_index(inplace=True,drop=True)
+            reseñas_procesadas = []
+            for i in range(df.shape[0]):
+                texto1 = re.sub("[^a-zA-Z]"," ",str(df['Reseña'].values[i]))
+                texto2 = nltk.tokenize.word_tokenize(texto1.lower())
+                lista = [word for word in texto2 if word not in stopwords]
+                reseñas_procesadas += lista
+            frec_palabras = nltk.FreqDist(reseñas_procesadas)
+            frec_palabras_df = pd.DataFrame(list(frec_palabras.items()), columns = ["Palabra","Frequencia"])
+            return frec_palabras_df.sort_values(by='Frequencia',ascending=False)
 
-#********** Dashboard Puntuaciones
-    
-    # st.dataframe(rating) #Línea de control para identificar el DF filtrado
-    # f"Porcentaje de promotores: {promotores}" #Línea de control
-    # f"Porcentaje de detractores: {detractores}" #Línea de control
-    # f"NPS es de {nps}" #Línea de control
-    col1, col2, col3, col4, col5 = st.columns(5) #Se utiliza este línea para acomodar al centro el gráfico al disminuirlo de tamaño
-    with col2:        
-        st.plotly_chart(fig_kpi2, config={"displayModeBar": False, "responsive": True})
+        #-------- Definimos tablas de reseñas---------------
+        #Hacemos una copia del DF de reseñas filtradas, pero solo extraemos las columnas que interesan para el proceso
+        reseniasypuntaje= reviews_filtradas[["Rating","Reseña"]].copy()
 
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        # st.markdown(f"<h6 style='text-align: center;'>Promedio mensual de puntuaciones <br> {periodo}</h6>", unsafe_allow_html=True)
-        st.plotly_chart(fig_res) #Se muestra sólo las 5 reseñas con más elementos negativos            
-    with col3:
-        #st.write(f"Reseñas positivas: {res_positivas.head(5)['Frequencia'].sum()}")
-        st.plotly_chart(fig_bar_puntuaciones) #Se muestra sólo las 5 reseñas con más elementos positivos    
+        #Aplicamos la función para obtener reseñas positivas con 5 puntos
+        res_positivas = procesamientoResenas(reseniasypuntaje,5)
+        tot_res_pos=len(reviews_filtradas[reviews_filtradas["Rating"].isin([5])]) #Identificamos cuántas son
 
-#---------------------------------------------Fin Análisis de Puntuaciones-----------------------------------------------
+        #Aplicamos la función para obtener reseñas negativas con 1, 2 y 3 puntos. 
+        res_negativas1 = procesamientoResenas(reseniasypuntaje,1)
+        res_negativas2 = procesamientoResenas(reseniasypuntaje,2)
+        res_negativas3 = procesamientoResenas(reseniasypuntaje,3)
+        res_negativas = pd.concat([res_negativas1,res_negativas2,res_negativas3], axis=0, ignore_index=True)
+        tot_res_neg = len(reviews_filtradas[reviews_filtradas["Rating"].isin([1,2,3])])
+
+        #Condicionamos el KPI si no tiene reseñas positivas o negativas, enviar un mensaje. Ya que división entre cero no es posible.
+        if tot_res_pos == 0 and tot_res_neg ==0:    
+            st.warning(f"El restaurante: '{slide_restaurant}'; en el Estado de {estado}, no cuenta con reseñas para evaluar.", icon="ℹ️")
+        elif tot_res_neg == 0:
+            st.warning(f"El restaurante: '{slide_restaurant}'; en el Estado de {estado}, no cuenta con reseñas negativas. Todas son positivas ¡F e l i c i d a d e s!.")
+        else: #Si hay datos, se procede a elaborar el gráfico para el indicador.
+            fig_kpi1 = go.Figure(go.Indicator(
+                mode = "gauge+number+delta",
+                value = round((tot_res_pos / tot_res_neg),1),
+                domain = {'x': [1, 0], 'y': [1, 0]},
+                title = {'text': f"Indice de Reseñas Positivas <br> {periodo}", 'font': {'size': 24,'color':"orange"}},
+                delta = {'reference': 1.5, 'increasing': {'color': "orange"}},
+                gauge = {
+                    'axis': {'range': [None, 3], 'tickwidth': 1, 'tickcolor': "orange"},
+                    'bar': {'color': "orange"},
+                    'bgcolor': "yellow",
+                    'borderwidth': 2,
+                    'bordercolor': "gray",
+                    'steps': [
+                        {'range': [0, 1], 'color': '#FD5752'},
+                        {'range': [1, 1.5], 'color': '#FAFD52'},
+                        {'range': [1.5, 3], 'color': '#ABD758'}],
+                    'threshold': {
+                        'line': {'color': "red", 'width': 4},
+                        'thickness': 0.75,
+                        'value': 1.5}}))
+            fig_kpi1.update_layout(width = 420, height = 320, font = {'family': "Arial"})
+            col1, col2, col3, col4, col5 = st.columns(5) #Se utiliza este línea para acomodar al centro el gráfico al disminuirlo de tamaño
+            with col2:        
+                st.plotly_chart(fig_kpi1, config={"displayModeBar": False, "responsive": True})
+
+        #*******************Dashboard Reseñas
+
+
+        # f"Cantidad de registros sin filtrar: {resenias.shape[0]}" #Línea de control para ver las reseñas sin filtro
+        # f"Cantidad de registros filtrados por tipo y estado: {reviews_filtradas.shape[0]}" #Línea de control para ver las reseñas con filtro
+        # f"Estado de Código: {estado_cod}, tipo: {type(estado_cod)}" #Línea de control para ver el códgio del Estado que esta seleccionado
+        # st.dataframe(reviews_filtradas) #Prueba para ver el DF reseñas que se carga (este se puede eliminar del dashboard)
+        # f"Reseñas positivas totales 5: {tot_res_pos}" #Línea de control
+        # f"Reseñas negativas totales 1: {res_negativas1['Frequencia'].sum()}" #Línea de control
+        # f"Reseñas negativas totales 2: {res_negativas2['Frequencia'].sum()}" #Línea de control
+        # f"Reseñas negativas totales3: {res_negativas3['Frequencia'].sum()}" #Línea de control
+        # f"Total reseñas negativas 1,2,3: {tot_res_neg}" #Línea de control
+
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            #st.write(f"Reseñas negativas: {res_negativas.head(5)['Frequencia'].sum()}")
+            st.write(f"Reseñas negativas: {tot_res_neg}")
+            st.dataframe(res_negativas.head(5)) #Se muestra sólo las 5 reseñas con más elementos negativos            
+        with col3:
+            #st.write(f"Reseñas positivas: {res_positivas.head(5)['Frequencia'].sum()}")
+            st.write(f"Reseñas positivas: {tot_res_pos}")
+            st.dataframe(res_positivas.head(5)) #Se muestra sólo las 5 reseñas con más elementos positivos
+
+
+        col1,col2,col3 = st.columns(3)
+        with col1:
+            if st.button('Ver reseñas negativas'):
+                # info_res_neg1= reseniasypuntaje.loc[(reseniasypuntaje['Rating'].isin([1, 2])) & (reseniasypuntaje['Reseña'].str.contains(res_negativas["Palabra"][0]))]
+                # info_res_neg2= reseniasypuntaje.loc[(reseniasypuntaje['Rating'].isin([1, 2])) & (reseniasypuntaje['Reseña'].str.contains(res_negativas["Palabra"][1]))]
+                # info_res_neg3= reseniasypuntaje.loc[(reseniasypuntaje['Rating'].isin([1, 2])) & (reseniasypuntaje['Reseña'].str.contains(res_negativas["Palabra"][2]))]
+                # info_res_neg4= reseniasypuntaje.loc[(reseniasypuntaje['Rating'].isin([1, 2])) & (reseniasypuntaje['Reseña'].str.contains(res_negativas["Palabra"][3]))]
+                # info_res_neg5= reseniasypuntaje.loc[(reseniasypuntaje['Rating'].isin([1, 2])) & (reseniasypuntaje['Reseña'].str.contains(res_negativas["Palabra"][4]))]
+                # informe_negativo = pd.concat([info_res_neg1["Reseña"],info_res_neg2["Reseña"],info_res_neg3["Reseña"],info_res_neg4["Reseña"],info_res_neg5["Reseña"]])
+                #Borrar duplicado
+                informe_negativo2= reseniasypuntaje.loc[(reseniasypuntaje['Rating'].isin([1,2,3]))]
+                informe_negativo2
+        with col3:
+            if st.button('Ver reseñas positivas'):
+                # info_res_pos1 = reseniasypuntaje[(reseniasypuntaje['Reseña'].str.contains(res_positivas["Palabra"][0])) & (reseniasypuntaje['Rating'] == 5)]
+                # info_res_pos2 = reseniasypuntaje[(reseniasypuntaje['Reseña'].str.contains(res_positivas["Palabra"][1])) & (reseniasypuntaje['Rating'] == 5)]
+                # info_res_pos3 = reseniasypuntaje[(reseniasypuntaje['Reseña'].str.contains(res_positivas["Palabra"][2])) & (reseniasypuntaje['Rating'] == 5)]
+                # info_res_pos4 = reseniasypuntaje[(reseniasypuntaje['Reseña'].str.contains(res_positivas["Palabra"][3])) & (reseniasypuntaje['Rating'] == 5)]
+                # info_res_pos5 = reseniasypuntaje[(reseniasypuntaje['Reseña'].str.contains(res_positivas["Palabra"][4])) & (reseniasypuntaje['Rating'] == 5)]
+                # informe_positivo = pd.concat([info_res_pos1["Reseña"],info_res_pos2["Reseña"],info_res_pos3["Reseña"],info_res_pos4["Reseña"],info_res_pos5["Reseña"]],axis=0,ignore_index=True)
+                informe_positivo2 = reseniasypuntaje[(reseniasypuntaje['Rating'] == 5)]
+                informe_positivo2
+                #informe_positivo
+
+    #-----------------------------------------Fin Análisis de Reseñas-----------------------------------------------
+
+
+
+
+    #-----------------------------------------Inicio Análisis de Puntuaciones-----------------------------------------------
+    st.markdown("<h2 style='text-align: center; color: orange;'>Puntuaciones</h2>", unsafe_allow_html=True)
+
+    rating = reviews_fs.copy() #Generamos una copia para no afectar los demás DF
+    #rating
+
+    if rating.empty:    
+        st.warning('No existen puntuaciones para los filtros seleccionados.', icon="ℹ️")    
+    else:
+        df_rating = rating.groupby('Rating')["Id_Usuario"].nunique()
+        positivo = 0
+        negativo = 0
+        for i in df_rating.index:
+            if i == 5:
+                positivo = df_rating[i]
+            elif i == 3 or i== 2 or i == 1:
+                negativo += df_rating[i]
+
+        promotores = round(positivo / df_rating.sum() * 100,2) #porcentaje de promotores
+        detractores = round(negativo / df_rating.sum() * 100,2) #porcentaje de detractores
+        nps = promotores - detractores
+        
+        #Graficamos el resultado. Nota: HAY QUE REVISAR SI SE REQUIERE CONDICIONAR EL GRÁFICO.
+        fig_kpi2 = go.Figure(go.Indicator(
+            mode = "gauge+number+delta",
+            value = nps,
+            domain = {'x': [1, 0], 'y': [1, 0]},
+            title = {'text': "Porcentaje Red de Promotores", 'font': {'size': 24, 'color':"orange"}},
+            delta = {'reference': 30, 'increasing': {'color': "orange"}},
+            gauge = {
+                'axis': {'range': [-100, 100], 'tickwidth': 3, 'tickcolor': "orange"},
+                'bar': {'color': "orange"},
+                'bgcolor': "yellow",
+                'borderwidth': 2,
+                'bordercolor': "gray",
+                'steps': [
+                    {'range': [-100, 0], 'color': '#FD5752'},
+                    {'range': [0, 30], 'color': '#FAFD52'},
+                    {'range': [30, 100], 'color': '#ABD758'}],
+                'threshold': {
+                    'line': {'color': "red", 'width': 4},
+                    'thickness': 0.75,
+                    'value': 30}},
+            number = {'suffix': '%'}))
+        fig_kpi2.update_layout(width = 420, height = 320, font = {'family': "Arial"})
+        
+    #---Gráfico de líneas para presentar el comportamiento de las reseñas a través del tiempo
+        #promedio = rating.groupby(["Timestamp"]).mean()
+        promedio = rating.set_index("Timestamp").resample("M").mean()
+        fig_point = go.Figure()
+        fig_point.add_trace(go.Scatter(x=promedio.index, y=promedio["Rating"],
+                            mode='lines',
+                            name='Tasa de interés',
+                            line=dict(color='orange', width=2)))
+        fig_point.update_layout(
+            title={
+                'text': f"Promedio de puntuaciones {periodo}",
+                #'font': {'color': 'white'} ,
+                'x':0.5, # Centrar el título
+                'xanchor': 'center' # Centrar el título
+                },
+            font=dict(family="Arial",size=12,color='orange' ),
+            xaxis_title="Fecha",
+            yaxis_title="Promedio de puntaje",
+            plot_bgcolor='rgba(0,0,0,0)',
+            autosize=True,
+            margin=dict(l=50, r=0, t=0, b=0),
+            width = 400, height=300)
+        
+
+
+        
+    #---Gráfico de barras para mostrar la distribución
+        gr_puntuaciones = rating.groupby("Rating").size().reset_index(name='counts')    
+        gr_puntuaciones = gr_puntuaciones.sort_values(by='Rating', ascending=False) # Ordenar los valores de mayor a menor
+        fig_bar_puntuaciones = px.bar(gr_puntuaciones, x="counts", y="Rating", orientation='h', color_discrete_sequence=['#FFA500'])     # Crear el gráfico de barras
+        fig_bar_puntuaciones.update_layout( # Establecer el título y los títulos de los ejes
+            title={
+                'text': "Cantidad de puntuaciones por valor",
+                #'font': {'color': 'white'} ,
+                'x':0.5, # Centrar el título
+                'xanchor': 'center' # Centrar el título
+                },
+            xaxis_title="Cantidad de puntuaciones",
+            yaxis_title="Valor de puntuación",
+            font=dict(family="Arial", size=20, color="white"),
+            plot_bgcolor='rgba(0,0,0,0)', width = 300, height=350)
+
+    #********** Dashboard Puntuaciones
+        
+        # st.dataframe(rating) #Línea de control para identificar el DF filtrado
+        # f"Porcentaje de promotores: {promotores}" #Línea de control
+        # f"Porcentaje de detractores: {detractores}" #Línea de control
+        # f"NPS es de {nps}" #Línea de control
+        col1, col2, col3, col4, col5 = st.columns(5) #Se utiliza este línea para acomodar al centro el gráfico al disminuirlo de tamaño
+        with col2:        
+            st.plotly_chart(fig_kpi2, config={"displayModeBar": False, "responsive": True})
+
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            # st.markdown(f"<h6 style='text-align: center;'>Promedio mensual de puntuaciones <br> {periodo}</h6>", unsafe_allow_html=True)
+            st.plotly_chart(fig_point) #Se muestra sólo las 5 reseñas con más elementos negativos            
+        with col3:
+            #st.write(f"Reseñas positivas: {res_positivas.head(5)['Frequencia'].sum()}")
+            st.plotly_chart(fig_bar_puntuaciones) #Se muestra sólo las 5 reseñas con más elementos positivos  
+
+
+
+
+
+
+
+
+
+
+
+
+
+    #---------------------------------------------Fin Análisis de Puntuaciones-----------------------------------------------
 
 
 #---------------------------------------------Inicio Análisis de Atributos------------------------------------------
@@ -568,10 +590,15 @@ st.plotly_chart(fig_corr_barra)
 
 
 #-------------------------------------------- Inicio Métricas Macroeconómicas-----------------------------------------------
+
+st.markdown("<h2 style='text-align: center; color: orange;'>Indicadores Macroeconómicos</h2>", unsafe_allow_html=True)
+
+anios= st.number_input('¿De cuántos años atrás quiere conocer la información?',value=8, min_value=1,max_value=20)
+
 #---Tasa de Interés
 
 tasa_interes = yf.Ticker("^TNX")
-tasa_hist= tasa_interes.history(period="8y")
+tasa_hist= tasa_interes.history(period=f"{anios}y")
 tasa_hist= tasa_hist["Close"]
 media = round(tasa_hist.mean(),2)
 tasa = round(tasa_hist.iloc[-1],2)
@@ -594,7 +621,7 @@ fig_tasa.update_layout(
 
 #ETF TIP como valor del posible comportamiento de la inflación
 inflacion_yahoo = yf.Ticker("TIP")
-infla_y= inflacion_yahoo.history(period="5y")
+infla_y= inflacion_yahoo.history(period=f"{anios}y")
 infla_y= infla_y["Close"]
 infla_media = round(infla_y.mean(),2)
 inflacion = round(infla_y.iloc[-1],2)
@@ -637,7 +664,7 @@ fig_ipc.update_layout(
 
 #************* Dashboard Macroeconómicos
 
-st.markdown("<h2 style='text-align: center; color: orange;'>Indicadores Macroeconómicos</h2>", unsafe_allow_html=True)
+
 # f"El valor medio de ETF (TIP) es: {infla_media}" #Control para diseño
 # f"El último valor de ETF (TIP) es: {inflacion}" #Control para diseño
 # f"media de la tasa es {media}" #Control para diseño
@@ -680,3 +707,32 @@ with col2:
             ''')
     st.plotly_chart(fig_ipc) # Mostrar la gráfica en Streamlit
 
+
+if st.button('Resumen'):
+    st.write(f"""
+    * Estado: {estado}
+    * Tipo de comida: {slide_tipo}
+    * Restaurante: {slide_restaurant}
+    * Ciudad: {slide_ciudad}
+    * Índice de Reseñas Positivas: {round((tot_res_pos / tot_res_neg),1)}
+    * % Red de Promotores (NPS): {nps}%
+    * % Cumplimiento de atributos clave: {round(kpi_atrib,2)}%
+    * Tasa interés: {tasa} con una variación de {round(var_tasa,2)} del promedio en los últimos {anios} años
+    * ETF TIP: {inflacion} con una variación de {round(var_infl,2)} del promedio en los últimos {anios} años
+    """)
+
+
+# Estados en proceso de mejora:
+# Arizona----
+# California----
+# Delaware ---
+# Florida --
+# Idaho ---
+# Illinois ---
+# Indiana ---
+# Louisiana --
+# Missouri ---
+# Nevada --
+# New Jersey  --
+# Pennsylvania ---
+# Tennessee --
