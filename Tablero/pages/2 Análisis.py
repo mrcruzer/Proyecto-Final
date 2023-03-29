@@ -15,20 +15,18 @@ nltk.download('stopwords')
 nltk.download('punkt')
 
 
-st.markdown("<h1 style='text-align: center; color: orange;'>¡A n á l i s i s!</h1>", unsafe_allow_html=True)
-
-st.subheader('Selección de filtros')
+st.markdown("<h1 style='text-align: center; color: orange;'>*¡A n á l i s i s!*</h1>", unsafe_allow_html=True)
 
 #Definimos listas de estados y códigos
 state_codes = {'Alabama': 'AL','Alaska': 'AK','Arizona': 'AZ','Arkansas': 'AR','California': 'CA','Colorado': 'CO','Connecticut': 'CT',
     'Delaware': 'DE','Florida': 'FL','Georgia': 'GA','Hawaii': 'HI','Idaho': 'ID','Illinois': 'IL','Indiana': 'IN','Iowa': 'IA',
     'Kansas': 'KS','Kentucky': 'KY','Louisiana': 'LA','Maine': 'ME','Maryland': 'MD','Massachusetts': 'MA','Michigan': 'MI',
-    'Minnesota': 'MN','Mississippi': 'MS', 'Missouri': 'MO', 'Montana': 'MT','Nebraska': 'NE','Nevada': 'NV','New Hampshire': 'NH',
-    'New Jersey': 'NJ','New Mexico': 'NM','New York': 'NY','North Carolina': 'NC','North Dakota': 'ND','Ohio': 'OH','Oklahoma': 'OK',
-    'Oregon': 'OR','Pennsylvania': 'PA','Rhode Island': 'RI','South Carolina': 'SC','South Dakota': 'SD','Tennessee': 'TN','Texas': 'TX',
-    'Utah': 'UT','Vermont': 'VT','Virginia': 'VA','Washington': 'WA','West Virginia': 'WV','Wisconsin': 'WI','Wyoming': 'WY'}
+    'Minnesota': 'MN','Mississippi': 'MS', 'Missouri': 'MO', 'Montana': 'MT','Nebraska': 'NE','Nevada': 'NV','New_Hampshire': 'NH',
+    'New_Jersey': 'NJ','New_Mexico': 'NM','New_York': 'NY','North_Carolina': 'NC','North_Dakota': 'ND','Ohio': 'OH','Oklahoma': 'OK',
+    'Oregon': 'OR','Pennsylvania': 'PA','Rhode_Island': 'RI','South_Carolina': 'SC','South_Dakota': 'SD','Tennessee': 'TN','Texas': 'TX',
+    'Utah': 'UT','Vermont': 'VT','Virginia': 'VA','Washington': 'WA','West_Virginia': 'WV','Wisconsin': 'WI','Wyoming': 'WY'}
 
-estados = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Columbia','Georgia',
+estados = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia',
            'Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan',
            'Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New_Hampshire','New_Jersey','New_Mexico','New_York',
            'North_Carolina','North_Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode_Island','South_Carolina','South_Dakota',
@@ -59,18 +57,82 @@ def filtro_restaurante_nombre(data,nombre):
         data = data[data['Nombre'] == nombre]
     return data
 
+@st.cache_data
+def filtro_restaurante_ciudad(data,nombre):
+    if nombre != "Todos":
+        data = data[data['Ciudad'] == nombre]
+    return data
+
+@st.cache_data
+def filtro_restaurante_id(data,nombre):
+    if nombre != "Todos":
+        data = data[data['Id_Restaurant'] == nombre]
+    return data
+
 # Definimos los filtros por Estado, por Tipo de Comida y por Restaurante
-estado = st.selectbox("Seleccione el estado del que está buscando información", estados)
+estado = st.sidebar.selectbox("Seleccione el estado del que está buscando información", estados)
 estado_cod = state_codes.get(estado, "Todos")
 restaurants_fe = filtro_restaurante_estado(restaurants, estado_cod)
 
 kind_food = np.concatenate((restaurants_fe["Tipo"].unique(),["Todos"]))
-slide_tipo= st.selectbox("Seleccione el tipo de comida de su interés", kind_food)
+slide_tipo= st.sidebar.selectbox("Seleccione el tipo de comida de su interés", kind_food)
 restaurants_ft = filtro_restaurante_tipo(restaurants_fe, slide_tipo)
 
 restaur = np.concatenate((["Todos"],restaurants_ft["Nombre"].unique()))
-slide_restaurant = st.selectbox("Seleccione el nombre del restaurante de su interés", restaur)
+slide_restaurant = st.sidebar.selectbox("Seleccione el nombre del restaurante de su interés", restaur)
 restaurants_fn = filtro_restaurante_nombre(restaurants_ft, slide_restaurant)
+
+# restaurants_fn  # línea de control para ver el DF antes de aplicar filtro por colonia y sucursal(id)
+
+restaurant_por_ciudad = np.concatenate((["Todos"],restaurants_fn["Ciudad"].unique()))
+slide_ciudad = st.sidebar.selectbox("Seleccione el nombre de la Ciudad", restaurant_por_ciudad)
+restaurants_fc = filtro_restaurante_ciudad(restaurants_fn, slide_ciudad)
+
+restaurant_por_sucursal = np.concatenate((["Todos"],restaurants_fc["Id_Restaurant"].unique()))
+slide_sucursal = st.sidebar.selectbox("Seleccione el Id del Restaurante", restaurant_por_sucursal)
+restaurants_fs = filtro_restaurante_id(restaurants_fc, slide_sucursal)
+
+
+# restaurants_fs #línea de control para ver como queda el DF con el if anterior para filtrar por colonia y sucursal
+
+
+#---------------------- Fin del código para el proceso de filtrado de los DF---------------------------------------
+
+# Hasta esta línea tendriamos los DF filtrados: 
+# st.dataframe(restaurants_fs) 
+# st.dataframe(resenias) 
+
+#----------------------------------------- Inicio Mapa de ubicaciones -----------------------------------------
+st.markdown("<h3 style='text-align: center; color: orange;'>¡Mapa de distribución!</h3>", unsafe_allow_html=True)
+
+#** Este bloque muestra un mapa de ubicaciones, es interesante, pero se satura mucho por la cantidad de restaurantes.
+# Crear un mapa centrado en las coordenadas del primer restaurante
+# m = folium.Map(location=[restaurants_fs.iloc[0]['Latitud'], restaurants_fs.iloc[0]['Longitud']], zoom_start=12)
+# # Agregar un marcador para cada restaurante
+# for i, row in restaurants_fs.iterrows():
+#     folium.Marker([row['Latitud'], row['Longitud']], popup=row['Nombre']).add_to(m)
+# folium_static(m) # Mostrar el mapa en Streamlit
+
+df_map = restaurants_fs.loc[:, ['Latitud', 'Longitud']]
+df_map = df_map.rename(columns={'Latitud': 'LAT', 'Longitud': 'LON'})
+st.map(df_map)
+
+
+f"Se encontraron {restaurants_fe.shape[0]} restaurantes en {estado}" #línea de control para ver el filtrado
+f"Se encontraron {restaurants_ft.shape[0]} restaurantes de {slide_tipo}" #línea de control para ver el filtrado
+f"Sucursales del restaurante {slide_restaurant}: {restaurants_fs.shape[0]}" #línea de control para ver el filtrado
+
+# f"La fecha de inicio es {filtro_fecha[0]}, formato {type(filtro_fecha[0])}" # control para comprobar los datos
+# f"La fecha de inicio es {filtro_fecha[1]}, formato {type(filtro_fecha[1])}" # control para comprobar los datos
+
+# f"año{anio_inicio}, tipo {type(anio_inicio)}" Línea de control para conocer el formato de la fecha 
+
+#----------------------------------------- Fin Mapa de ubicaciones -----------------------------------------
+
+
+#-----------------------------------------Inicio Análisis de Reseñas-----------------------------------------------
+st.markdown("<h2 style='text-align: center; color: orange;'>Reseñas</h2>", unsafe_allow_html=True)
+# -------Filtro del DF--------
 
 #Para el DF de reseñas, solo se puede filtrar por periodo de tiempo
 reviews["Timestamp"] = pd.to_datetime(reviews["Timestamp"]) #Se pone a formato fecha
@@ -82,76 +144,29 @@ filtro_fecha = st.slider("Selecciones periodo a revisar", value=(datetime(fecha1
 # Aplicación del Filtro sobre el DF (creación de nueva variable)
 resenias = reviews[(reviews["Timestamp"] >= filtro_fecha[0]) & (reviews["Timestamp"] <= filtro_fecha[1])]
 
-#---------------------- Fin del código para el proceso de filtrado de los DF---------------------------------------
-
-# Hasta esta línea tendriamos los DF filtrados: 
-# st.dataframe(restaurants_fn) 
-# st.dataframe(resenias) 
-
-#----------------------------------------- Inicio Mapa de ubicaciones -----------------------------------------
-#** Este bloque muestra un mapa de ubicaciones, es interesante, pero se satura mucho por la cantidad de restaurantes.
-# Crear un mapa centrado en las coordenadas del primer restaurante
-# m = folium.Map(location=[restaurants_fn.iloc[0]['Latitud'], restaurants_fn.iloc[0]['Longitud']], zoom_start=12)
-# # Agregar un marcador para cada restaurante
-# for i, row in restaurants_fn.iterrows():
-#     folium.Marker([row['Latitud'], row['Longitud']], popup=row['Nombre']).add_to(m)
-# folium_static(m) # Mostrar el mapa en Streamlit
-
-df_map = restaurants_fn.loc[:, ['Latitud', 'Longitud']]
-df_map = df_map.rename(columns={'Latitud': 'LAT', 'Longitud': 'LON'})
-st.map(df_map)
-
-
-f"Se ecnontraron {restaurants_fe.shape[0]} restaurantes en {estado}" #línea de control para ver el filtrado
-f"Se encontraron {restaurants_ft.shape[0]} restaurantes de {slide_tipo}" #línea de control para ver el filtrado
-f"Sucursales del restaurante {slide_restaurant}: {restaurants_fn.shape[0]}" #línea de control para ver el filtrado
-
-f"La fecha de inicio es {filtro_fecha[0]}, formato {type(filtro_fecha[0])}" # control para comprobar los datos
-f"La fecha de inicio es {filtro_fecha[1]}, formato {type(filtro_fecha[1])}" # control para comprobar los datos
-
-f"Las reseñas totales son: {reviews.shape[0]}" # control para comprobar los datos
-f"Las reseñas filtradas por tiempo son: {resenias.shape[0]}" # control para comprobar los datos
-
 anio_inicio = filtro_fecha[0].strftime("%Y")
 mes_inicio = filtro_fecha[0].strftime("%m")
 dia_inicio = filtro_fecha[0].strftime("%d")
 anio_fin = filtro_fecha[1].strftime("%Y")
 mes_fin = filtro_fecha[1].strftime("%m")
 dia_fin = filtro_fecha[1].strftime("%d")
-
-f"año{anio_inicio}, tipo {type(anio_inicio)}"
-
-#----------------------------------------- Fin Mapa de ubicaciones -----------------------------------------
+periodo = f"del {anio_inicio}-{mes_inicio}-{dia_inicio} al {anio_fin}-{mes_fin}-{dia_fin}"
+# periodo # línea de control para ver el texto del periodo para los gráficos
 
 
-#-----------------------------------------Inicio Análisis de Reseñas-----------------------------------------------
-st.markdown("<h2 style='text-align: center; color: orange;'>Reseñas</h2>", unsafe_allow_html=True)
-# -------Filtro del DF--------
 # Creamos la función que filtrará las reseñas que tienen que ver con los DF filtrados previamente
-@st.cache_data
-def resenia_filtro(dfrev,dfrest,cod,tipo,rest):
-#Primero se unen los DF de restaurantes y reseñas para identificar de las reseñas, el Estado, Tipo y Restaurante que se seleccionaron en el Dashboard
-    data = dfrev.merge(dfrest[["Id_Restaurant","Nombre","Tipo","Estado"]],on="Id_Restaurant", how="left")
-    if cod != "Todos": #Se aplica filtro de codigo de Estado
-        data1 = data[(data["Estado"] == cod)]
-    else: data1 = data #Si no hay filtro se deja el original
-    if tipo != "Todos": 
-        data2 = data1[data1["Tipo"] == tipo]
-    else: data2 = data1
-    if rest !="Todos":
-        data3 = data2[data2["Nombre"] == rest]
-    else: data3 = data2
-    return data3
+# Aquí iría el código de SQL server para definir el nuevo DF
 
-#Se aplica la función de unión y filtro
-reviews_filtradas = resenia_filtro(resenias,restaurants,estado_cod,slide_tipo,slide_restaurant)
+reviews_filtradas = resenias.merge(restaurants_fs[["Id_Restaurant","Nombre","Tipo","Estado","Ciudad"]],on="Id_Restaurant", how="inner")
+
+# reviews_filtradas línea de control para revisar el filtro
 
 #--------- Proceso de reseñas ----------
 stopwords = nltk.corpus.stopwords.words('english')
 
 #Le agregamos algunos adjetivos que no nos van a brindar informacion alguna (se puede ir actualizando)
 agregar_a_sw = ['good','bad','awesome','awfull','love','like','well','ok','get','back','never','one','two','three',
-                'four','five','go','would','got','said','us','came','ask','told','went','better','worst']
+                'four','five','go','would','got','said','us','came','ask','told','went','better','worst','always']
 for p in agregar_a_sw:
     stopwords.append(p)
 
@@ -182,6 +197,7 @@ tot_res_pos=res_positivas['Frequencia'].sum() #Identificamos cuántas son
 res_negativas1 = procesamientoResenas(reseniasypuntaje,1)
 res_negativas2 = procesamientoResenas(reseniasypuntaje,2)
 res_negativas3 = procesamientoResenas(reseniasypuntaje,3)
+res_negativas = pd.concat([res_negativas1,res_negativas2,res_negativas3], axis=0, ignore_index=True)
 tot_res_neg = res_negativas1['Frequencia'].sum() + res_negativas2['Frequencia'].sum() + res_negativas3['Frequencia'].sum()
 
 #Condicionamos el KPI si no tiene reseñas positivas o negativas, enviar un mensaje. Ya que división entre cero no es posible.
@@ -194,8 +210,8 @@ else: #Si hay datos, se procede a elaborar el gráfico para el indicador.
         mode = "gauge+number+delta",
         value = tot_res_pos / tot_res_neg,
         domain = {'x': [1, 0], 'y': [1, 0]},
-        title = {'text': "Indice de reseñas positivas para", 'font': {'size': 24,'color':"orange"}},
-        delta = {'reference': 1.3, 'increasing': {'color': "orange"}},
+        title = {'text': f"Indice de Reseñas Positivas <br> {periodo}", 'font': {'size': 24,'color':"orange"}},
+        delta = {'reference': 1.5, 'increasing': {'color': "orange"}},
         gauge = {
             'axis': {'range': [None, 3], 'tickwidth': 1, 'tickcolor': "orange"},
             'bar': {'color': "orange"},
@@ -230,18 +246,39 @@ else: #Si hay datos, se procede a elaborar el gráfico para el indicador.
 
 col1, col2, col3 = st.columns(3)
 with col1:
-    st.write(f"Reseñas negativas: {res_negativas1.head(5)['Frequencia'].sum()}")
-    st.dataframe(res_negativas1.head(5)) #Se muestra sólo las 5 reseñas con más elementos negativos            
+    st.write(f"Reseñas negativas: {res_negativas.head(5)['Frequencia'].sum()}")
+    st.dataframe(res_negativas.head(5)) #Se muestra sólo las 5 reseñas con más elementos negativos            
 with col3:
     st.write(f"Reseñas positivas: {res_positivas.head(5)['Frequencia'].sum()}")
     st.dataframe(res_positivas.head(5)) #Se muestra sólo las 5 reseñas con más elementos positivos
 
 
+col1,col2,col3 = st.columns(3)
+with col1:
+    if st.button('Ver reseñas negativas'):
+        info_res_neg1= reseniasypuntaje.loc[(reseniasypuntaje['Rating'].isin([1, 2])) & (reseniasypuntaje['Reseña'].str.contains(res_negativas["Palabra"][0]))]
+        info_res_neg2= reseniasypuntaje.loc[(reseniasypuntaje['Rating'].isin([1, 2])) & (reseniasypuntaje['Reseña'].str.contains(res_negativas["Palabra"][1]))]
+        info_res_neg3= reseniasypuntaje.loc[(reseniasypuntaje['Rating'].isin([1, 2])) & (reseniasypuntaje['Reseña'].str.contains(res_negativas["Palabra"][2]))]
+        info_res_neg4= reseniasypuntaje.loc[(reseniasypuntaje['Rating'].isin([1, 2])) & (reseniasypuntaje['Reseña'].str.contains(res_negativas["Palabra"][3]))]
+        info_res_neg5= reseniasypuntaje.loc[(reseniasypuntaje['Rating'].isin([1, 2])) & (reseniasypuntaje['Reseña'].str.contains(res_negativas["Palabra"][4]))]
+        informe_negativo = pd.concat([info_res_neg1["Reseña"],info_res_neg2["Reseña"],info_res_neg3["Reseña"],info_res_neg4["Reseña"],info_res_neg5["Reseña"]])
+        #Borrar duplicado
+
+        informe_negativo2= reseniasypuntaje.loc[(reseniasypuntaje['Rating'].isin([1, 2,3]))]
+        informe_negativo2
+with col3:
+    if st.button('Ver reseñas positivas'):
+        # info_res_pos1 = reseniasypuntaje[(reseniasypuntaje['Reseña'].str.contains(res_positivas["Palabra"][0])) & (reseniasypuntaje['Rating'] == 5)]
+        # info_res_pos2 = reseniasypuntaje[(reseniasypuntaje['Reseña'].str.contains(res_positivas["Palabra"][1])) & (reseniasypuntaje['Rating'] == 5)]
+        # info_res_pos3 = reseniasypuntaje[(reseniasypuntaje['Reseña'].str.contains(res_positivas["Palabra"][2])) & (reseniasypuntaje['Rating'] == 5)]
+        # info_res_pos4 = reseniasypuntaje[(reseniasypuntaje['Reseña'].str.contains(res_positivas["Palabra"][3])) & (reseniasypuntaje['Rating'] == 5)]
+        # info_res_pos5 = reseniasypuntaje[(reseniasypuntaje['Reseña'].str.contains(res_positivas["Palabra"][4])) & (reseniasypuntaje['Rating'] == 5)]
+        # informe_positivo = pd.concat([info_res_pos1["Reseña"],info_res_pos2["Reseña"],info_res_pos3["Reseña"],info_res_pos4["Reseña"],info_res_pos5["Reseña"]],axis=0,ignore_index=True)
+        informe_positivo2 = reseniasypuntaje[(reseniasypuntaje['Rating'] == 5)]
+        informe_positivo2
+        #informe_positivo
+
 #-----------------------------------------Fin Análisis de Reseñas-----------------------------------------------
-
-
-
-
 
 
 
@@ -249,6 +286,7 @@ with col3:
 #-----------------------------------------Inicio Análisis de Puntuaciones-----------------------------------------------
 st.markdown("<h2 style='text-align: center; color: orange;'>Puntuaciones</h2>", unsafe_allow_html=True)
 rating = reviews_filtradas.copy() #Generamos una copia para no afectar los demás DF
+rating
 
 if rating.empty:    
     st.warning('No existen puntuaciones para los filtros seleccionados.', icon="ℹ️")    
@@ -271,7 +309,7 @@ else:
         mode = "gauge+number+delta",
         value = nps,
         domain = {'x': [1, 0], 'y': [1, 0]},
-        title = {'text': "Porcentaje Red de Promotores", 'font': {'size': 24,'color':"orange"}},
+        title = {'text': "Porcentaje Red de Promotores", 'font': {'size': 24, 'color':"orange"}},
         delta = {'reference': 30, 'increasing': {'color': "orange"}},
         gauge = {
             'axis': {'range': [-100, 100], 'tickwidth': 3, 'tickcolor': "orange"},
@@ -306,8 +344,11 @@ else:
 #---Línea para dar formato a la gráfica.
     fig_res.update_layout(
     title={
-        'text': f"Promedio de puntuaciones del restaurante: {slide_restaurant}",
-        'font': {'color': 'white'}},
+        'text': f"Promedio de puntuaciones <br> {periodo}",
+        'x':0.5, # Centrar el título
+        'xanchor': 'center' # Centrar el título
+            }, #'font': {'color': 'gray'}},
+       
     xaxis_title="Mes",
     yaxis_title="Puntuación",
     font=dict(
@@ -333,11 +374,14 @@ else:
     fig_bar_puntuaciones.update_layout( # Establecer el título y los títulos de los ejes
         title={
             'text': "Cantidad de puntuaciones por valor",
-            'font': {'color': 'white'} },
+            #'font': {'color': 'white'} ,
+            'x':0.5, # Centrar el título
+            'xanchor': 'center' # Centrar el título
+            },
         xaxis_title="Cantidad de puntuaciones",
         yaxis_title="Valor de puntuación",
         font=dict(family="Arial", size=20, color="white"),
-        plot_bgcolor='rgba(0,0,0,0)', width = 300, height=300)
+        plot_bgcolor='rgba(0,0,0,0)', width = 300, height=350)
 
 #********** Dashboard Puntuaciones
     
@@ -346,13 +390,12 @@ else:
     # f"Porcentaje de detractores: {detractores}" #Línea de control
     # f"NPS es de {nps}" #Línea de control
     col1, col2, col3, col4, col5 = st.columns(5) #Se utiliza este línea para acomodar al centro el gráfico al disminuirlo de tamaño
-    with col2:
-        st.write(f"KPI reseñas")
+    with col2:        
         st.plotly_chart(fig_kpi2, config={"displayModeBar": False, "responsive": True})
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        #st.write(f"Reseñas negativas: {res_negativas1.head(5)['Frequencia'].sum()}")
+        # st.markdown(f"<h6 style='text-align: center;'>Promedio mensual de puntuaciones <br> {periodo}</h6>", unsafe_allow_html=True)
         st.plotly_chart(fig_res) #Se muestra sólo las 5 reseñas con más elementos negativos            
     with col3:
         #st.write(f"Reseñas positivas: {res_positivas.head(5)['Frequencia'].sum()}")
@@ -362,13 +405,15 @@ else:
 
 
 #---------------------------------------------Inicio Análisis de Atributos------------------------------------------
+st.markdown("<h2 style='text-align: center; color: orange;'>Atributos</h2>", unsafe_allow_html=True)
 # Para el análisis de atributos utilizaremos una copia del DF hasta el filtro de Tipo de comida.
 atributos_tipo = restaurants_ft.copy() 
 atributos_tipo = atributos_tipo.drop(['Id_Restaurant', 'Nombre', 'Ciudad', 'Estado', 'Cod_postal', 'Latitud','Longitud', 'Tipo','Cant_reviews'], axis=1) #eliminamos columnas dejando los atributos y puntuaciones
 
 #Se va requerir atributos del restaurante específico:
-atributos_restaurant = restaurants_fn.copy()
+atributos_restaurant = restaurants_fs.copy()
 atributos_restaurant = atributos_restaurant.drop(['Id_Restaurant', 'Nombre', 'Ciudad', 'Estado', 'Cod_postal', 'Latitud','Longitud', 'Tipo','Cant_reviews'], axis=1) #eliminamos columnas dejando los atributos y puntuaciones
+# atributos_restaurant #Control de atributos filtrados
 
 #Creación de la matriz de correlación
 correlacion = atributos_tipo.corr() 
@@ -419,54 +464,106 @@ fig_kpi3 = go.Figure(go.Indicator(
     number = {'suffix': '%'}))
 fig_kpi3.update_layout(width = 420, height = 320, font = {'family': "Arial"})
 
-# Crear el mapa de calor
-fig_heatmap = go.Figure(data=go.Heatmap(
-        z=correlacion.values,
-        x=correlacion.index,
-        y=correlacion.columns,
-        colorscale='Oranges' ))
+#Otra opción para gráfico de barras:
 
-# Configurar el layout del mapa de calor
-fig_heatmap.update_layout(
-    title={
-        'text': f"Correlación entre el puntaje y los atributos\npara {slide_tipo}",
-        'font': {'family': 'Arial', 'size': 18, 'color': 'orange'},
-        'y': 0.95,
-        'x': 0.5,
-        'xanchor': 'center',
-        'yanchor': 'top'},
-    font=dict(
-        family='Arial',
-        size=12,
-        color='black'  ),
-    plot_bgcolor='rgba(0,0,0,0)', height=500)
+matriz_corr_barras = corr_puntaje[1:]
+fig_corr_barra = go.Figure(go.Bar(
+            x=matriz_corr_barras.index,
+            y=matriz_corr_barras.values,
+            orientation='v',
+            marker=dict(color='orange')
+        ))
+
+# Configurar el título y diseño del gráfico
+fig_corr_barra.update_layout(
+    title="Correlación entre el puntaje y los atributos",            
+    xaxis_title="Atributo",
+    yaxis_title="Coeficiente de correlación",
+    font=dict(family="Arial", size=20),    
+    margin=dict(l=200, r=0, t=50, b=50), # Espacio alrededor del gráfico
+    width=550 ,height=400,) # Tamaño del gráfico
+
+
 
 #***************** Dashboard Análisis de Atributos:
 
-st.markdown("<h2 style='text-align: center; color: orange;'>Atributos</h2>", unsafe_allow_html=True)
+# st.markdown("<h2 style='text-align: center; color: orange;'>Atributos</h2>", unsafe_allow_html=True)
 # st.write(atributos_restaurant.columns) #Control dashboard permite ver las columnas filtradas
 # st.dataframe(atributos_restaurant) #Control dashboard permite ver el DF de los atributos
+
+
+##Definir diccionario de atributos para boton
+
+dicc_atrib = {
+    "Ambiente": ["Ambience","GoodForDancing","Music","Atmosphere","NoiseLevel"], 
+    "Para grupos": ["RestaurantsGoodForGroups","Crowd", "AgesAllowed"], 
+    "Promociones": ["HappyHour","Offerings"], 
+    "Estacionamiento":["BikeParking","BusinessParking"],    
+    "Mejores noches": ["BestNights"],
+    "Inclusivo":["WheelchairAccessible","DogsAllowed","Accessibility"], 
+    "Amenidades":["HasTV","GoodForKids","WiFi","Amenities"],     
+    "Exteriores":["OutdoorSeating"],
+    "Alcohol":["BYOB","Corkage","BYOBCorkage","Alcohol"], 
+    "Restricciones en dieta":["DietaryRestrictions"],
+    "Reservaciones":["ByAppointmentOnly","RestaurantsReservations","Planning"],    
+    "Tipo de servicio":["DriveThru","RestaurantsDelivery","RestaurantsTakeOut","RestaurantsTableService","RestaurantsCounterService","Caters","Service options"],    #  
+    "Guardaropa":["CoatCheck"],    
+    "24 horas":["Open24Hours"],
+    "Tipos de pago":["BusinessAcceptsCreditCards","BusinessAcceptsBitcoin","Payments"], 
+    "Opciones (Des,Com,Cena)":["Dining options","GoodForMeal","Popular for"], 
+    "Tipo director":["From the business","Filosofia","Historia","Prácticas"],
+    "Vestimenta":["RestaurantsAttire"],
+    "Salud y Seguridad": ["Health and safety"],    
+    "Rango de precios":["RestaurantsPriceRange2","Escala del 1 al 4"],
+    "Aspectos destacados":["Highlights","Hechas por usuarios"], 
+    "Fumar":["Smoking"],
+}
+
+
+
 
 col1, col2, col3, col4, col5 = st.columns(5) #Se utiliza este línea para acomodar al centro el gráfico al disminuirlo de tamaño
 with col2: #KPI
     st.plotly_chart(fig_kpi3, config={"displayModeBar": False, "responsive": True})
 
-col1,col2,col3 = st.columns(3) #Colocamos en columnas del Dashboard
-with col1: #Top6 atributos
-    st.markdown("<h4 style='text-align: center; color: orange;'>Top 6 Atributos influyentes</h4>", unsafe_allow_html=True)    
-    st.write(top_atributos)
-with col2:#Atributos del restaurante
-    st.markdown(f"<h4 style='text-align: center; color: orange;'>Atributos de: {slide_restaurant}</h4>", unsafe_allow_html=True)
-    df_atrib_rest=pd.DataFrame(atributos_restaurant.columns,columns=["Atributos"])
-    st.write(df_atrib_rest)
-with col3: #Atributos pendientes
-    if len(mejorar_atributos) == 0:
-        st.markdown(f"<h4 style='text-align: center; color: orange;'>Se tienen cubierto los 6 atributos más relevantes</h4>", unsafe_allow_html=True)        
-    else:
-        st.markdown(f"<h4 style='text-align: center; color: orange;'>Atributos a considerar</h4>", unsafe_allow_html=True)        
-        st.table(mejorar_atributos)
+# col1,col2,col3 = st.columns(3) #Colocamos en columnas del Dashboard
+# with col1: #Top6 atributos
+#     st.markdown(f"<h6 style='text-align: center;'>Top 6 Atributos influyentes<br>{slide_tipo}</h6>", unsafe_allow_html=True)    
+#     st.write(top_atributos)
+# with col2:#Atributos del restaurante
+#     st.markdown(f"<h6 style='text-align: center;'>Atributos de:<br> {slide_restaurant}</h6>", unsafe_allow_html=True)
+#     df_atrib_rest=pd.DataFrame(atributos_restaurant.columns,columns=["Atributos"])
+#     st.write(df_atrib_rest)
+# with col3: #Atributos pendientes
+#     if len(mejorar_atributos) == 0:
+#         st.markdown(f"<h6 style='text-align: center;'>Se tienen cubierto los 6 atributos más relevantes</h6>", unsafe_allow_html=True)        
+#     else:
+#         st.markdown(f"<h6 style='text-align: center;'>Atributos a considerar</h6>", unsafe_allow_html=True)        
+#         st.table(mejorar_atributos)
+#         if st.button('Ver características'):
+#             mejorar_atributos["Características"] = mejorar_atributos["Atributos"].map(dicc_atrib)
+#             mejorar_atributos
 
-st.plotly_chart(fig_heatmap)# Mostrar el mapa de calor
+tab1, tab2, tab3 = st.tabs(["Top 6", "Actuales", "A considerar"])
+
+with tab1:
+   st.header(f"Top 6 Atributos influyentes de {slide_tipo}")
+   st.table(top_atributos)
+
+with tab2:
+   st.header(f"Atributos de {slide_restaurant}")
+   df_atrib_rest=pd.DataFrame(atributos_restaurant.columns,columns=["Atributos"])
+   st.table(df_atrib_rest)
+
+with tab3:
+    st.header(f"Atributos a considerar")
+    st.table(mejorar_atributos)
+    if st.button('Ver características'):
+        mejorar_atributos["Características"] = mejorar_atributos["Atributos"].map(dicc_atrib)
+        mejorar_atributos
+
+# Mostrar el gráfico en Streamlit
+st.plotly_chart(fig_corr_barra)
 #----------------------------------------------Fin Análisis de Atributos---------------------------------------------
 
 
@@ -554,14 +651,32 @@ with col4:
 
 titulo_tasafed = "<h4 style='text-align:center; color:white;'>Tasa de interés de la FED</h4>"
 st.markdown(titulo_tasafed, unsafe_allow_html=True)
+if st.button('Saber más sobre la tasa de interés'):
+    st.write('''
+        Es la tasa a la que los bancos prestan dinero.
+        Si la tasa de interés aumenta, los préstamos y líneas de crédito se vuelven más costosos.
+        Puede afectar el poder adquisitivo de los consumidores.
+        Se utiliza para controlar la inflación.''')
 st.plotly_chart(fig_tasa)
 
 col1,col2 =st.columns(2)    
 with col1:
     titulo_etf = "<h4 style='text-align:center; color:white;'>ETF (TIP)</h4>"
     st.markdown(titulo_etf, unsafe_allow_html=True)
+    if st.button('Saber más sobre ETF(TIP)'):
+        st.write('''
+            Es un fondo cotizado en bolsa que invierte en bonos del Tesoro protegidos contra la inflación de EE. UU.
+            Ajusta su valor principal según el índice de precios al consumidor (IPC).
+            ''')
     st.plotly_chart(fig_tip)
 with col2:
     titulo_ipc = "<h4 style='text-align:center; color:white;'>IPC Banco Mundial</h4>"
     st.markdown(titulo_ipc, unsafe_allow_html=True)
+    if st.button('Saber más sobre el IPC'):
+        st.write('''
+            Es un indicador económico que mide el cambio promedio de los precios de un conjunto de bienes y servicios representativos del consumo de los hogares.
+            Se utiliza para medir el poder adquisitivo de una moneda.
+            Si el IPC aumenta significativamente, los costos de los ingredientes y los suministros pueden aumentar, lo que a su vez puede llevar a que los precios de los alimentos y las bebidas aumenten.
+            ''')
     st.plotly_chart(fig_ipc) # Mostrar la gráfica en Streamlit
+
